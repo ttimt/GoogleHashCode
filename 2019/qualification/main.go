@@ -8,7 +8,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"time"
 )
 
 // Photo
@@ -28,10 +27,13 @@ func main() {
 	answer := AssignVertical(photos)
 
 	// Genetic algorithm
-	answer = GeneticAlgo(answer, rand.New(rand.NewSource(time.Now().Unix())), 500)
+	// answer = GeneticAlgo(answer, rand.New(rand.NewSource(time.Now().Unix())), 100)
+
+	// Debug
+	// fmt.Println("DEBUG:", answer)
 
 	// Final score
-	fmt.Println("Score:")
+	fmt.Println("Final score:")
 	fmt.Println(CalcScore(answer))
 }
 
@@ -56,36 +58,66 @@ func AssignVertical(photos []Photo) (answer []Photo) {
 	for k, v := range singleVertical {
 		// Process current image
 		if !v.isUsedAsVertical {
-			singleVertical[k].isUsedAsVertical = true
-
 			// If no vertical image left, discard this image from use
 			if k+1 == len(singleVertical) {
 				break
 			}
 
 			// Pick another vertical photo to form a slide
-			// We want photo with lowest score in the transition
-			lowestScorePhoto := singleVertical[k+1]
-
 			for j, v1 := range singleVertical[k+1:] {
-				if !v1.isUsedAsVertical {
-					// Check their score
+				if !v1.isUsedAsVertical && CalcScoreBetweenTwo(v, v1) > 0 {
+					// Append v1 into v
+					AppendVerticalPhoto(&singleVertical[k], &singleVertical[k+1+j])
+
+					singleVertical[k].isUsedAsVertical = true
+					singleVertical[k+1+j].isUsedAsVertical = true
+
+					answer = append(answer, singleVertical[k])
+
+					break
 				}
 			}
+		}
+	}
 
-			answer = append(answer, v)
+	// Process all remaining images (Like those left because their score with other vertical images are all zero)
+	for k, v := range singleVertical {
+		if !v.isUsedAsVertical && k+1 < len(singleVertical) {
+			for j, v1 := range singleVertical[k+1:] {
+				if !v1.isUsedAsVertical {
+					// Append next unassigned vertical photo to v
+					AppendVerticalPhoto(&singleVertical[k], &singleVertical[k+1+j])
+
+					singleVertical[k].isUsedAsVertical = true
+					singleVertical[k+1+j].isUsedAsVertical = true
+
+					break
+				}
+			}
 		}
 	}
 
 	return
 }
 
+func AppendVerticalPhoto(photo, photo1 *Photo) {
+	for t, _ := range photo1.tags {
+		if _, ok := photo.tags[t]; !ok {
+			photo.nrOfTag++
+			photo.tags[t] = struct{}{}
+		}
+	}
+}
+
 func ReadFile() (photos []Photo, nrOfPhotos int) {
 	// Define file location
-	filePath := "qualification_round_2019/a_example.txt"
+	// filePath := "qualification_round_2019/a_example.txt"
 	// filePath := "qualification_round_2019/b_lovely_landscapes.txt"
-	// filePath := "qualification_round_2019/c_memorable_moments.txt"
+	filePath := "qualification_round_2019/c_memorable_moments.txt"
 	// filePath := "qualification_round_2019/d_pet_pictures.txt"
+	fmt.Println("Importing ......")
+	fmt.Println("File used:", filePath)
+	fmt.Println()
 
 	// Read line
 	file, err := os.Open(filePath)
@@ -104,8 +136,9 @@ func ReadFile() (photos []Photo, nrOfPhotos int) {
 	for {
 		line, err := ioReader.ReadString('\n')
 		if err == io.EOF {
-			fmt.Println("Eod of file reached!")
 			break
+		} else if err != nil {
+			panic(err.Error())
 		}
 
 		// Process the line
@@ -116,6 +149,7 @@ func ReadFile() (photos []Photo, nrOfPhotos int) {
 		photo := Photo{
 			orientation: byte(lines[0][0]),
 			nrOfTag:     nrOfTag,
+			tags:        map[string]struct{}{},
 		}
 
 		// Assign tags to photo
@@ -132,7 +166,7 @@ func ReadFile() (photos []Photo, nrOfPhotos int) {
 func GeneticAlgo(answer []Photo, r *rand.Rand, repetition int) []Photo {
 	var set [][]Photo
 
-	size := 15
+	size := 3
 	maxLen := len(answer)
 	x := make(map[string]struct{})
 
@@ -172,7 +206,7 @@ func GeneticAlgo(answer []Photo, r *rand.Rand, repetition int) []Photo {
 		fmt.Println(allZero)
 		fmt.Println(allZeroSlice)
 		fmt.Println(CalcScore(answer))
-		panic("")
+		// panic("")
 		rand1 := allZeroSlice[r.Intn(len(allZeroSlice))]
 		rand2 := r.Intn(maxLen)
 
@@ -262,7 +296,7 @@ func CalcScore(answer []Photo) int {
 		scoreArr = append(scoreArr, currentScore)
 	}
 
-	fmt.Println(scoreArr)
+	// fmt.Println(scoreArr)
 
 	return score
 }
