@@ -8,6 +8,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // Photo
@@ -27,7 +28,9 @@ func main() {
 	answer := AssignVertical(photos)
 
 	// Genetic algorithm
-	// answer = GeneticAlgo(answer, rand.New(rand.NewSource(time.Now().Unix())), 100)
+	fmt.Println(time.Now().Local())
+	answer = GeneticAlgorithm(answer, rand.New(rand.NewSource(time.Now().Unix())), 10000)
+	fmt.Println(time.Now().Local())
 
 	// Debug
 	// fmt.Println("DEBUG:", answer)
@@ -163,10 +166,10 @@ func ReadFile() (photos []Photo, nrOfPhotos int) {
 	return
 }
 
-func GeneticAlgo(answer []Photo, r *rand.Rand, repetition int) []Photo {
+func GeneticAlgorithm(answer []Photo, r *rand.Rand, repetition int) []Photo {
 	var set [][]Photo
 
-	size := 3
+	size := 100
 	maxLen := len(answer)
 	x := make(map[string]struct{})
 
@@ -203,10 +206,7 @@ func GeneticAlgo(answer []Photo, r *rand.Rand, repetition int) []Photo {
 				allZeroSlice = append(allZeroSlice, k+1)
 			}
 		}
-		fmt.Println(allZero)
-		fmt.Println(allZeroSlice)
-		fmt.Println(CalcScore(answer))
-		// panic("")
+
 		rand1 := allZeroSlice[r.Intn(len(allZeroSlice))]
 		rand2 := r.Intn(maxLen)
 
@@ -222,7 +222,6 @@ func GeneticAlgo(answer []Photo, r *rand.Rand, repetition int) []Photo {
 			}
 		}
 
-		// fmt.Println("rand1",rand1, "rand2", rand2)
 		if _, ok := x[string(rand1)+string(rand2)]; ok {
 			i--
 			continue
@@ -253,25 +252,25 @@ func GeneticAlgo(answer []Photo, r *rand.Rand, repetition int) []Photo {
 	// 	randomInstance = r.Intn(len(set))
 	// }
 	if repetition != 0 {
-		for i := 0; i < 1; i++ {
-			// Random mutation
-			rand3 := r.Intn(maxLen)
-			anotherRand := rand3
-
-			if rand3+1 == maxLen {
-				anotherRand--
-			} else {
-				anotherRand++
-			}
-			temp := set[maxPosition][rand3]
-			set[maxPosition][rand3] = set[maxPosition][anotherRand]
-			set[maxPosition][anotherRand] = temp
-		}
+		// for i := 0; i < 1; i++ {
+		// 	// Random mutation
+		// 	rand3 := r.Intn(maxLen)
+		// 	anotherRand := rand3
+		//
+		// 	if rand3+1 == maxLen {
+		// 		anotherRand--
+		// 	} else {
+		// 		anotherRand++
+		// 	}
+		// 	temp := set[maxPosition][rand3]
+		// 	set[maxPosition][rand3] = set[maxPosition][anotherRand]
+		// 	set[maxPosition][anotherRand] = temp
+		// }
 
 		repetition--
 
 		// Recursive
-		answer = GeneticAlgo(set[maxPosition], r, repetition)
+		answer = GeneticAlgorithm(set[maxPosition], r, repetition)
 	}
 
 	if CalcScore(set[maxPosition]) > CalcScore(answer) {
