@@ -12,12 +12,12 @@ import (
 )
 
 const (
-	populationSize = 15
-	repetition     = 2000
+	populationSize = 10
+	repetition     = 200
 	// filePath       = "qualification_round_2019/a_example.txt"
 	// filePath       = "qualification_round_2019/b_lovely_landscapes.txt"
 	filePath = "qualification_round_2019/c_memorable_moments.txt"
-	// filePath       = "qualification_round_2019/d_pet_pictures.txt"
+	// filePath = "qualification_round_2019/d_pet_pictures.txt"
 )
 
 // Photo
@@ -26,7 +26,10 @@ type Photo struct {
 	nrOfTag          int
 	tags             map[string]struct{}
 	isUsedAsVertical bool
+	id               int
 }
+
+var scores = make([]int, 0)
 
 func main() {
 	// Read file
@@ -40,11 +43,13 @@ func main() {
 
 	// Genetic algorithm
 	fmt.Println("Running algorithm ......")
-	answer = GeneticAlgorithm(answer, rand.New(rand.NewSource(time.Now().Unix())), repetition)
+	answer = GeneticAlgorithm(answer, nil, rand.New(rand.NewSource(time.Now().Unix())), repetition)
 
 	// Final score
 	fmt.Println("Final score:")
 	fmt.Println(CalcScore(answer))
+
+	fmt.Println(scores)
 }
 
 func AssignVertical(photos []Photo) (answer []Photo) {
@@ -123,6 +128,9 @@ func ReadFile() (photos []Photo, nrOfPhotos int) {
 	// Define file location
 	fmt.Println("File used:", filePath)
 
+	// Initialize ID
+	var id int
+
 	// Read line
 	file, err := os.Open(filePath)
 
@@ -154,6 +162,7 @@ func ReadFile() (photos []Photo, nrOfPhotos int) {
 			orientation: byte(lines[0][0]),
 			nrOfTag:     nrOfTag,
 			tags:        map[string]struct{}{},
+			id:          id,
 		}
 
 		// Assign tags to photo
@@ -162,12 +171,14 @@ func ReadFile() (photos []Photo, nrOfPhotos int) {
 		}
 
 		photos = append(photos, photo)
+
+		id++
 	}
 
 	return
 }
 
-func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
+func GeneticAlgorithm(slideShow, parent []Photo, r *rand.Rand, repetition int) []Photo {
 	// 1. Generate population / a set of slide shows
 	// 2. Pick the fittest
 	// 3. Create an offspring from the fittest and a random slide show
@@ -175,9 +186,14 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 	// 5. Repeat by adding the mutated offspring to the population set in (1)
 
 	// 1. Generate a population / a set of slide shows
+	fmt.Println("1.0 Repetition:", repetition)
+
 	// Use to store the population and store the original slide show in the set
 	var set [][]Photo
 	set = append(set, slideShow)
+	if parent != nil {
+		set = append(set, parent)
+	}
 
 	// Store the random number of mutation to occur per slide show in a set
 	var numberOfMutation, firstPhotoPosition, secondPhotoPosition int
@@ -188,18 +204,24 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 	// Store the temporary photo when swapping
 	var swap Photo
 
+	fmt.Println("1.1 Repetition:", repetition)
+
 	for i := 0; i < populationSize; i++ {
 		// Store the new instance of slide show
 		newSlideShow := make([]Photo, lenSlideShow)
 		copy(newSlideShow, slideShow)
 
+		fmt.Println("1.2 Repetition:", repetition)
+
 		// Generate a number for number of mutation from the original slide show
-		numberOfMutation = r.Intn(lenSlideShow / 2)
+		numberOfMutation = r.Intn(lenSlideShow/2) / 2
 
 		// Ensure there's at least one mutation to be different from the first slide show
 		if numberOfMutation == 0 {
 			numberOfMutation++
 		}
+
+		fmt.Println("1.3 Repetition:", repetition)
 
 		// Randomly select 2 photo to swap for numberOfMutation iteration
 		for j := 0; j < numberOfMutation; j++ {
@@ -207,8 +229,12 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 			firstPhotoPosition = r.Intn(lenSlideShow)
 			secondPhotoPosition = r.Intn(lenSlideShow)
 
+			fmt.Println("1.4 Repetition:", repetition)
+
 			// Ensure the 2 positions are unique
 			EnsureUniqueNumber(&firstPhotoPosition, &secondPhotoPosition, lenSlideShow)
+
+			fmt.Println("1.5 Repetition:", repetition)
 
 			// Swap the photo
 			swap = newSlideShow[firstPhotoPosition]
@@ -216,11 +242,15 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 			newSlideShow[secondPhotoPosition] = swap
 		}
 
+		fmt.Println("1.6 Repetition:", repetition)
+
 		// Store the new slide show into the population
 		set = append(set, newSlideShow)
 	}
 
 	// 2. Calculate and pick the fittest slide show
+	fmt.Println("2.0 Repetition:", repetition)
+
 	// Store the fittest genetic
 	fittestSlideShow := 0
 	highestScore := 0
@@ -233,6 +263,8 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 	}
 
 	// 3. Create an offspring from the fittest slide show and a random slide show
+	fmt.Println("3.0 Repetition:", repetition)
+
 	// The random slide show selected could be the fittest slide show as well,
 	// which will cause the new offspring to have
 	// the same gene as the fittest slide show prior to mutation
@@ -248,7 +280,10 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 	// Insert the gene into the offspring if the gene does not exist in the offspring
 
 	// Create the new offspring
-	offspring := make([]Photo, lenSlideShow)
+	offspring := make([]Photo, 0)
+
+	// Create a map to store the photos id
+	offSpringIDList := make(map[int]struct{})
 
 	// Select start and length of gene from the first parent
 	startPositionFirstParent := r.Intn(lenSlideShow)
@@ -258,36 +293,37 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 	// Insert the selected first parent gene into the offspring
 	for _, p := range set[fittestSlideShow][startPositionFirstParent:endPositionFirstParent] {
 		offspring = append(offspring, p)
+		offSpringIDList[p.id] = struct{}{}
 	}
 
 	// Iterate second parent from end gene position of first parent till end
 	for _, p := range randomParent[endPositionFirstParent:] {
 		// Go to next gene if current gene already exist in offspring
-		for _, pOff := range offspring {
-			if IsPhotoEqual(&p, &pOff) {
-				continue
-			}
+		if _, ok := offSpringIDList[p.id]; ok {
+			continue
 		}
 
 		// Add gene to offspring if this iteration is not skipped
 		offspring = append(offspring, p)
+		offSpringIDList[p.id] = struct{}{}
 	}
 
-	// Iterate second parent from start to start gene of first parent
-	for _, p := range randomParent[:startPositionFirstParent] {
+	// Iterate second parent from start to end gene of first parent
+	for _, p := range randomParent[:endPositionFirstParent] {
 		// Go to next gene if current gene already exist in offspring
-		for _, pOff := range offspring {
-			if IsPhotoEqual(&p, &pOff) {
-				continue
-			}
+		if _, ok := offSpringIDList[p.id]; ok {
+			continue
 		}
 
 		offspring = append(offspring, p)
+		offSpringIDList[p.id] = struct{}{}
 	}
 
 	// 4. Mutate the offspring
+	fmt.Println("4.0 Repetition:", repetition)
+
 	numberOfMutation = r.Intn(lenSlideShow / 2)
-	numberOfMutation = 0
+
 	for i := 0; i < numberOfMutation; i++ {
 		// Get 2 random photo in the slide show to swap
 		firstPhotoPosition = r.Intn(lenSlideShow)
@@ -301,12 +337,21 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 		offspring[secondPhotoPosition] = swap
 	}
 
+	// DEBUG: Check if scores get better
+	scores = append(scores, CalcScore(offspring))
+
 	// 5. Repeat by adding mutated offspring to the population set
+	fmt.Println("5.0 Repetition:", repetition)
+
 	if repetition != 0 {
 		repetition--
 
 		// Recursive
-		slideShow = GeneticAlgorithm(set[fittestSlideShow], r, repetition)
+		slideShow = GeneticAlgorithm(offspring, set[fittestSlideShow], r, repetition)
+	}
+
+	if CalcScore(offspring) > CalcScore(slideShow) {
+		slideShow = offspring
 	}
 
 	if CalcScore(set[fittestSlideShow]) > CalcScore(slideShow) {
