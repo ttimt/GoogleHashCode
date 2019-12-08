@@ -11,6 +11,15 @@ import (
 	"time"
 )
 
+const (
+	populationSize = 15
+	repetition     = 2000
+	// filePath       = "qualification_round_2019/a_example.txt"
+	// filePath       = "qualification_round_2019/b_lovely_landscapes.txt"
+	filePath = "qualification_round_2019/c_memorable_moments.txt"
+	// filePath       = "qualification_round_2019/d_pet_pictures.txt"
+)
+
 // Photo
 type Photo struct {
 	orientation      byte // H or V
@@ -21,19 +30,17 @@ type Photo struct {
 
 func main() {
 	// Read file
+	fmt.Println("Importing ......")
 	photos, nrOfPhotos := ReadFile()
 	fmt.Println("Number of photos:", nrOfPhotos)
 
 	// Assign vertical
+	fmt.Println("Assigning vertical photos ......")
 	answer := AssignVertical(photos)
 
 	// Genetic algorithm
-	fmt.Println(time.Now().Local())
-	answer = GeneticAlgorithm(answer, rand.New(rand.NewSource(time.Now().Unix())), 10000)
-	fmt.Println(time.Now().Local())
-
-	// Debug
-	// fmt.Println("DEBUG:", answer)
+	fmt.Println("Running algorithm ......")
+	answer = GeneticAlgorithm(answer, rand.New(rand.NewSource(time.Now().Unix())), repetition)
 
 	// Final score
 	fmt.Println("Final score:")
@@ -114,13 +121,7 @@ func AppendVerticalPhoto(photo, photo1 *Photo) {
 
 func ReadFile() (photos []Photo, nrOfPhotos int) {
 	// Define file location
-	// filePath := "qualification_round_2019/a_example.txt"
-	// filePath := "qualification_round_2019/b_lovely_landscapes.txt"
-	filePath := "qualification_round_2019/c_memorable_moments.txt"
-	// filePath := "qualification_round_2019/d_pet_pictures.txt"
-	fmt.Println("Importing ......")
 	fmt.Println("File used:", filePath)
-	fmt.Println()
 
 	// Read line
 	file, err := os.Open(filePath)
@@ -166,133 +167,206 @@ func ReadFile() (photos []Photo, nrOfPhotos int) {
 	return
 }
 
-func GeneticAlgorithm(answer []Photo, r *rand.Rand, repetition int) []Photo {
+func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
+	// 1. Generate population / a set of slide shows
+	// 2. Pick the fittest
+	// 3. Create an offspring from the fittest and a random slide show
+	// 4. Mutation to the offspring
+	// 5. Repeat by adding the mutated offspring to the population set in (1)
+
+	// 1. Generate a population / a set of slide shows
+	// Use to store the population and store the original slide show in the set
 	var set [][]Photo
+	set = append(set, slideShow)
 
-	size := 100
-	maxLen := len(answer)
-	x := make(map[string]struct{})
+	// Store the random number of mutation to occur per slide show in a set
+	var numberOfMutation, firstPhotoPosition, secondPhotoPosition int
 
-	for i := 0; i < size; i++ {
-		newAns := make([]Photo, len(answer))
-		copy(newAns, answer)
+	// Length of slide show
+	lenSlideShow := len(slideShow)
 
-		// Create a map that store position and randomly select them
-		allZero := make(map[int]struct{})
-		allZeroSlice := make([]int, 1)
+	// Store the temporary photo when swapping
+	var swap Photo
 
-		for k, _ := range newAns[1:] {
-			leftCount := len(newAns[k+1-1].tags)
-			rightCount := len(newAns[k+1].tags)
-			overlapCount := 0
+	for i := 0; i < populationSize; i++ {
+		// Store the new instance of slide show
+		newSlideShow := make([]Photo, lenSlideShow)
+		copy(newSlideShow, slideShow)
 
-			for _, t1 := range newAns[k+1].tags {
-				overlap := false
-				for _, t0 := range answer[k+1-1].tags {
-					if t0 == t1 {
-						overlap = true
-						break
-					}
-				}
-				if overlap {
-					leftCount--
-					rightCount--
-					overlapCount++
-				}
-			}
-			score := min(leftCount, rightCount, overlapCount)
-			if score == 0 {
-				allZero[k+1] = struct{}{}
-				allZeroSlice = append(allZeroSlice, k+1)
-			}
+		// Generate a number for number of mutation from the original slide show
+		numberOfMutation = r.Intn(lenSlideShow / 2)
+
+		// Ensure there's at least one mutation to be different from the first slide show
+		if numberOfMutation == 0 {
+			numberOfMutation++
 		}
 
-		rand1 := allZeroSlice[r.Intn(len(allZeroSlice))]
-		rand2 := r.Intn(maxLen)
+		// Randomly select 2 photo to swap for numberOfMutation iteration
+		for j := 0; j < numberOfMutation; j++ {
+			// Get 2 random photo in the slide show to swap
+			firstPhotoPosition = r.Intn(lenSlideShow)
+			secondPhotoPosition = r.Intn(lenSlideShow)
 
-		for _, ok := allZero[rand2]; ok; _, ok = allZero[rand2] {
-			rand2 = r.Intn(maxLen)
+			// Ensure the 2 positions are unique
+			EnsureUniqueNumber(&firstPhotoPosition, &secondPhotoPosition, lenSlideShow)
+
+			// Swap the photo
+			swap = newSlideShow[firstPhotoPosition]
+			newSlideShow[firstPhotoPosition] = newSlideShow[secondPhotoPosition]
+			newSlideShow[secondPhotoPosition] = swap
 		}
 
-		if rand1 == rand2 {
-			if rand2+1 != maxLen {
-				rand2++
-			} else {
-				rand2--
-			}
-		}
-
-		if _, ok := x[string(rand1)+string(rand2)]; ok {
-			i--
-			continue
-		}
-		x[string(rand1)+string(rand2)] = struct{}{}
-		x[string(rand2)+string(rand1)] = struct{}{}
-
-		tempPhoto := newAns[rand1]
-
-		newAns[rand1] = newAns[rand2]
-		newAns[rand2] = tempPhoto
-		set = append(set, newAns)
+		// Store the new slide show into the population
+		set = append(set, newSlideShow)
 	}
 
-	// Get the best genetic
-	maxPosition := 0
-	maxScore := CalcScore(set[0])
+	// 2. Calculate and pick the fittest slide show
+	// Store the fittest genetic
+	fittestSlideShow := 0
+	highestScore := 0
 
-	for k := range set[1:] {
-		if CalcScore(set[k+1]) > maxScore {
-			maxPosition = k + 1
+	// Traverse to all slide shows of population and get the fittest slide show in set
+	for k := range set {
+		if CalcScore(set[k]) > highestScore {
+			fittestSlideShow = k
 		}
 	}
 
-	// Select a random instance and reproduce
-	// randomInstance := r.Intn(len(set))
-	// for randomInstance == maxPosition {
-	// 	randomInstance = r.Intn(len(set))
-	// }
+	// 3. Create an offspring from the fittest slide show and a random slide show
+	// The random slide show selected could be the fittest slide show as well,
+	// which will cause the new offspring to have
+	// the same gene as the fittest slide show prior to mutation
+
+	// Get the random parent
+	randomParent := set[r.Intn(len(set))]
+
+	// Mate the two parents:
+	// Select a random point and length in the first parent
+	// Put the genes into the new offspring
+	// Traverse through the second parent starting
+	// at the end of  position of the selected gene of first parent
+	// Insert the gene into the offspring if the gene does not exist in the offspring
+
+	// Create the new offspring
+	offspring := make([]Photo, lenSlideShow)
+
+	// Select start and length of gene from the first parent
+	startPositionFirstParent := r.Intn(lenSlideShow)
+	lengthGeneOfFirstParent := r.Intn(lenSlideShow - startPositionFirstParent)
+	endPositionFirstParent := startPositionFirstParent + lengthGeneOfFirstParent
+
+	// Insert the selected first parent gene into the offspring
+	for _, p := range set[fittestSlideShow][startPositionFirstParent:endPositionFirstParent] {
+		offspring = append(offspring, p)
+	}
+
+	// Iterate second parent from end gene position of first parent till end
+	for _, p := range randomParent[endPositionFirstParent:] {
+		// Go to next gene if current gene already exist in offspring
+		for _, pOff := range offspring {
+			if IsPhotoEqual(&p, &pOff) {
+				continue
+			}
+		}
+
+		// Add gene to offspring if this iteration is not skipped
+		offspring = append(offspring, p)
+	}
+
+	// Iterate second parent from start to start gene of first parent
+	for _, p := range randomParent[:startPositionFirstParent] {
+		// Go to next gene if current gene already exist in offspring
+		for _, pOff := range offspring {
+			if IsPhotoEqual(&p, &pOff) {
+				continue
+			}
+		}
+
+		offspring = append(offspring, p)
+	}
+
+	// 4. Mutate the offspring
+	numberOfMutation = r.Intn(lenSlideShow / 2)
+	numberOfMutation = 0
+	for i := 0; i < numberOfMutation; i++ {
+		// Get 2 random photo in the slide show to swap
+		firstPhotoPosition = r.Intn(lenSlideShow)
+		secondPhotoPosition = r.Intn(lenSlideShow)
+
+		// Ensure the 2 positions are unique
+		EnsureUniqueNumber(&firstPhotoPosition, &secondPhotoPosition, lenSlideShow)
+
+		swap = offspring[firstPhotoPosition]
+		offspring[firstPhotoPosition] = offspring[secondPhotoPosition]
+		offspring[secondPhotoPosition] = swap
+	}
+
+	// 5. Repeat by adding mutated offspring to the population set
 	if repetition != 0 {
-		// for i := 0; i < 1; i++ {
-		// 	// Random mutation
-		// 	rand3 := r.Intn(maxLen)
-		// 	anotherRand := rand3
-		//
-		// 	if rand3+1 == maxLen {
-		// 		anotherRand--
-		// 	} else {
-		// 		anotherRand++
-		// 	}
-		// 	temp := set[maxPosition][rand3]
-		// 	set[maxPosition][rand3] = set[maxPosition][anotherRand]
-		// 	set[maxPosition][anotherRand] = temp
-		// }
-
 		repetition--
 
 		// Recursive
-		answer = GeneticAlgorithm(set[maxPosition], r, repetition)
+		slideShow = GeneticAlgorithm(set[fittestSlideShow], r, repetition)
 	}
 
-	if CalcScore(set[maxPosition]) > CalcScore(answer) {
-		answer = set[maxPosition]
+	if CalcScore(set[fittestSlideShow]) > CalcScore(slideShow) {
+		slideShow = set[fittestSlideShow]
 	}
 
-	return answer
+	return slideShow
 }
 
-func CalcScore(answer []Photo) int {
-	if len(answer) <= 1 {
+func IsPhotoEqual(photo1, photo2 *Photo) bool {
+	// Compare if two Photo struct are equal
+
+	// Compare orientation
+	if photo1.orientation != photo2.orientation {
+		return false
+	}
+
+	// Compare number of tags
+	if photo1.nrOfTag != photo2.nrOfTag {
+		return false
+	}
+
+	// Compare length of maps
+	if len(photo1.tags) != len(photo2.tags) {
+		return false
+	}
+
+	// Compare tags
+	for k := range photo1.tags {
+		if _, ok := photo2.tags[k]; !ok {
+			return false
+		}
+	}
+
+	return true
+}
+
+func EnsureUniqueNumber(x, y *int, len int) {
+	if x == y {
+		if *y+1 >= len {
+			*y--
+		} else {
+			*y++
+		}
+	}
+}
+
+func CalcScore(slideShow []Photo) int {
+	if len(slideShow) <= 1 {
 		return 0
 	}
 
 	score := 0
-	var scoreArr []int
+	// var scoreArr []int
 
-	for k, p := range answer[1:] {
-		currentScore := CalcScoreBetweenTwo(p, answer[k])
+	for k, p := range slideShow[1:] {
+		currentScore := CalcScoreBetweenTwo(p, slideShow[k])
 
 		score += currentScore
-		scoreArr = append(scoreArr, currentScore)
+		// scoreArr = append(scoreArr, currentScore)
 	}
 
 	// fmt.Println(scoreArr)
