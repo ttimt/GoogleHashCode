@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Chart</title>
+        <link rel="stylesheet" href="Chart.css">
+        <script type="text/javascript" src="Chart.bundle.min.js"></script>
+        <script type="text/javascript" src="moment.min.js"></script>
+    </head>
+    <body>
+        <canvas id="myChart" width="400" height="400"></canvas>
+
+        <script>
+            var highestDate = moment().set({
+				'year': 0,
+				'month': 0,
+				'date': 0,
+				'hour': 0,
+				'minute': 0,
+				'second': 0,
+				'millisecond': 0
+			});
+
+            var ctx = document.getElementById('myChart').getContext('2d');
+
+            var data = [{}];
+
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    label: ['Red'],
+                    datasets: [{
+                        label: ["Genetic Algorithm"],
+                        data: data,
+                        backgroundColor: ['rgba(255, 99, 132, 0.2)'],
+                        borderColor: ['rgba(255, 99, 132, 1)'],
+                        borderWidth: 2,
+                        fill: false,
+                        lineTension: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                min: 0,
+                                max: 1800
+                            }
+                        }],
+                        xAxes: [{
+                            type: 'time',
+                            time: {
+                                parser: "HH:mm:ss",
+                                unit: 'second',
+                            },
+                            ticks: {
+                                source: 'data',
+                                min: '00:00:00',
+                                max: '12:00:00'
+                            }
+                        }]
+                    }
+                }
+            });
+
+            function updateOption(chart, highestDate) {
+                chart.options.scales.xAxes[0].ticks.max = highestDate;
+            }
+
+            function receiveData() {
+                var data = [{
+                    x: moment("00:01:00", "HH:mm:ss"),
+                    y: 0
+                }, {
+                    x: moment("01:03:00", "HH:mm:ss"),
+                    y: 50
+                }, {
+                    x: moment("02:06:00", "HH:mm:ss"),
+                    y: 200
+                }, {
+                    x: moment("05:13:00", "HH:mm:ss"),
+                    y: 650
+                }, {
+                    x: moment("10:24:00", "HH:mm:ss"),
+                    y: 350
+                }];
+
+                data.forEach( d => {
+					addData(myChart, d);
+				})
+
+				myChart.update();
+            }
+
+            function addData(chart, data) {
+                chart.data.datasets[0].data.push(data);
+
+				if(data.x > highestDate)
+				{
+					highestDate = data.x;
+				}
+
+                updateOption(chart, highestDate);
+            }
+
+            function removeData(chart) {
+            	while(chart.data.datasets[0].data.length > 0)
+				{
+					chart.data.datasets[0].data.pop();
+				}
+
+                chart.update();
+            }
+        </script>
+    </body>
+</html>

@@ -13,7 +13,8 @@ import (
 
 const (
 	populationSize = 10
-	repetition     = 200
+	repetition     = 300
+	mutationRate   = 0.01
 	// filePath       = "qualification_round_2019/a_example.txt"
 	// filePath       = "qualification_round_2019/b_lovely_landscapes.txt"
 	filePath = "qualification_round_2019/c_memorable_moments.txt"
@@ -214,7 +215,7 @@ func GeneticAlgorithm(slideShow, parent []Photo, r *rand.Rand, repetition int) [
 		fmt.Println("1.2 Repetition:", repetition)
 
 		// Generate a number for number of mutation from the original slide show
-		numberOfMutation = r.Intn(lenSlideShow/2) / 2
+		numberOfMutation = r.Intn(lenSlideShow / 2)
 
 		// Ensure there's at least one mutation to be different from the first slide show
 		if numberOfMutation == 0 {
@@ -323,7 +324,7 @@ func GeneticAlgorithm(slideShow, parent []Photo, r *rand.Rand, repetition int) [
 	fmt.Println("4.0 Repetition:", repetition)
 
 	numberOfMutation = r.Intn(lenSlideShow / 2)
-
+	numberOfMutation = 1
 	for i := 0; i < numberOfMutation; i++ {
 		// Get 2 random photo in the slide show to swap
 		firstPhotoPosition = r.Intn(lenSlideShow)
@@ -336,9 +337,6 @@ func GeneticAlgorithm(slideShow, parent []Photo, r *rand.Rand, repetition int) [
 		offspring[firstPhotoPosition] = offspring[secondPhotoPosition]
 		offspring[secondPhotoPosition] = swap
 	}
-
-	// DEBUG: Check if scores get better
-	scores = append(scores, CalcScore(offspring))
 
 	// 5. Repeat by adding mutated offspring to the population set
 	fmt.Println("5.0 Repetition:", repetition)
@@ -357,6 +355,9 @@ func GeneticAlgorithm(slideShow, parent []Photo, r *rand.Rand, repetition int) [
 	if CalcScore(set[fittestSlideShow]) > CalcScore(slideShow) {
 		slideShow = set[fittestSlideShow]
 	}
+
+	// DEBUG: Check if scores get better
+	scores = append(scores, CalcScore(slideShow))
 
 	return slideShow
 }
