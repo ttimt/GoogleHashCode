@@ -4,11 +4,15 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"math/rand"
+	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gorilla/websocket"
 )
 
 const (
@@ -30,9 +34,93 @@ type Photo struct {
 	id               int
 }
 
-var scores = make([]int, 0)
+// Timer
+type Result struct {
+	X string `json:"x"` // HH::mm:ss
+	Y int    `json:"y"` // the score
+}
+
+var scores []Result
 
 func main() {
+	scores = append(scores, Result{
+		X: time.Now().Add(-time.Second * 1000).Format("12:04:05"),
+		Y: 213,
+	})
+	scores = append(scores, Result{
+		X: time.Now().Format("15:04:05"),
+		Y: 213,
+	})
+	scores = append(scores, Result{
+		X: time.Now().Format("15:04:05"),
+		Y: 2,
+	})
+
+	// Serve HTTP
+	go ServeHTTP()
+
+	select {}
+}
+
+func ServeHTTP() {
+	// File server
+	fs := http.FileServer(http.Dir("./"))
+	http.Handle("/", fs)
+	http.HandleFunc("/ws", HandleConnections)
+
+	// Start http web server
+	log.Println("http server started on :8081")
+
+	err := http.ListenAndServe(":8081", nil)
+	if err != nil {
+		panic("ListenAndServe:" + err.Error())
+	}
+}
+
+func HandleConnections(w http.ResponseWriter, r *http.Request) {
+	// Upgrade GET request to a web socket request
+	upgrader := websocket.Upgrader{}
+	ws, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// Close web socket at the end
+	defer ws.Close()
+
+	// Retrieve the client
+	client := ws
+
+	// Start using web socket
+	for {
+		// Read action from user
+		// _, m, err := ws.ReadMessage()
+		//
+		// if err != nil {
+		// 	if !websocket.IsCloseError(err, websocket.CloseNormalClosure,
+		// 		websocket.CloseGoingAway,
+		// 		websocket.CloseNoStatusReceived) {
+		// 		log.Println("ReadConnection:", err)
+		// 	} else {
+		// 		log.Println("Connection closed")
+		// 	}
+		// 	break
+		// } else {
+		// Message read success
+		// StartAlgorithm()
+
+		// Write to client
+		err = client.WriteJSON(scores)
+		if err != nil {
+			panic(err)
+		}
+		break
+		// }
+
+	}
+}
+
+func StartAlgorithm() {
 	// Read file
 	fmt.Println("Importing ......")
 	photos, nrOfPhotos := ReadFile()
@@ -357,7 +445,10 @@ func GeneticAlgorithm(slideShow, parent []Photo, r *rand.Rand, repetition int) [
 	}
 
 	// DEBUG: Check if scores get better
-	scores = append(scores, CalcScore(slideShow))
+	scores = append(scores, Result{
+		X: time.Now().Format("HH:mm:ss"),
+		Y: CalcScore(slideShow),
+	})
 
 	return slideShow
 }

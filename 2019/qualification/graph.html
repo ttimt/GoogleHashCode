@@ -8,7 +8,8 @@
         <script type="text/javascript" src="moment.min.js"></script>
     </head>
     <body>
-        <canvas id="myChart" width="400" height="400"></canvas>
+        <canvas id="myChart" width="300" height="200"></canvas>
+		<p id="webSocketStatus" style="text-align: center">Status: <b>Disconnected</b></p>
 
         <script>
             var highestDate = moment().set({
@@ -23,7 +24,7 @@
 
             var ctx = document.getElementById('myChart').getContext('2d');
 
-            var data = [{}];
+            var data = [];
 
             var myChart = new Chart(ctx, {
                 type: 'line',
@@ -59,37 +60,14 @@
                                 max: '12:00:00'
                             }
                         }]
-                    }
+                    },
+					responsive: true,
+					maintainAspectRatio: true
                 }
             });
 
             function updateOption(chart, highestDate) {
                 chart.options.scales.xAxes[0].ticks.max = highestDate;
-            }
-
-            function receiveData() {
-                var data = [{
-                    x: moment("00:01:00", "HH:mm:ss"),
-                    y: 0
-                }, {
-                    x: moment("01:03:00", "HH:mm:ss"),
-                    y: 50
-                }, {
-                    x: moment("02:06:00", "HH:mm:ss"),
-                    y: 200
-                }, {
-                    x: moment("05:13:00", "HH:mm:ss"),
-                    y: 650
-                }, {
-                    x: moment("10:24:00", "HH:mm:ss"),
-                    y: 350
-                }];
-
-                data.forEach( d => {
-					addData(myChart, d);
-				})
-
-				myChart.update();
             }
 
             function addData(chart, data) {
@@ -112,5 +90,38 @@
                 chart.update();
             }
         </script>
+		<script>
+			var socketStatusElement = document.getElementById("webSocketStatus");
+			var socket = new WebSocket("ws://" + window.location.host + "/ws");
+            // removeData(myChart);
+
+			socket.onopen = function () {
+				socketStatusElement.innerHTML = "Status: <b>Connected</b>";
+			}
+
+			// On receive message
+			socket.onmessage = function (e) {
+
+				data = JSON.parse(e.data);
+				data = [data]
+
+				data[0].forEach( d => {
+				    d.x = moment(d.x, "HH:mm:ss");
+
+					addData(myChart, d);
+				})
+
+				myChart.update();
+			}
+
+			// Send data
+			function send() {
+
+			}
+
+			window.onbeforeunload = function () {
+				socket.close();
+			}
+		</script>
     </body>
 </html>
