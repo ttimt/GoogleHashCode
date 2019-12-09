@@ -4,12 +4,25 @@
         <meta charset="UTF-8">
         <title>Chart</title>
         <link rel="stylesheet" href="Chart.css">
+        <link rel="stylesheet" href="semantic/semantic.min.css">
         <script type="text/javascript" src="Chart.bundle.min.js"></script>
+        <script type="text/javascript" src="jquery-3.4.1.min.js"></script>
         <script type="text/javascript" src="moment.min.js"></script>
+        <script type="text/javascript" src="semantic/semantic.min.js"></script>
     </head>
     <body>
-        <canvas id="myChart" width="300" height="200"></canvas>
-		<p id="webSocketStatus" style="text-align: center">Status: <b>Disconnected</b></p>
+        <div style="width: 100%; top: 3%; left: 2%; right: 2%; position: absolute;">
+            <div style="float: left; width: 60%; height: 600px"><canvas id="myChart" width="60%" height="100%"></canvas></div>
+            <div style="margin-left: 200px; position: relative; text-align: center;">
+                <p id="webSocketStatus">Websocket status: <b>Disconnected</b></p>
+                <div class="ui animated blue button" tabindex="0" onclick="runAlgorithm()">
+                    <div class="visible content" id="webSocketStatus">Run algorithm</b></div>
+                    <div class="hidden content">
+                        <i class="play icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <script>
             var highestDate = moment().set({
@@ -21,6 +34,7 @@
 				'second': 0,
 				'millisecond': 0
 			});
+            var lowestDate = null;
 
             var ctx = document.getElementById('myChart').getContext('2d');
 
@@ -37,7 +51,7 @@
                         borderColor: ['rgba(255, 99, 132, 1)'],
                         borderWidth: 2,
                         fill: false,
-                        lineTension: 1
+                        lineTension: 0.5
                     }]
                 },
                 options: {
@@ -57,17 +71,21 @@
                             ticks: {
                                 source: 'data',
                                 min: '00:00:00',
-                                max: '12:00:00'
+                                max: '00:00:00',
+                                autoSkip: false,
+                                maxRotation: 90,
+                                minRotation: 90
                             }
                         }]
                     },
 					responsive: true,
-					maintainAspectRatio: true
+					maintainAspectRatio: false
                 }
             });
 
-            function updateOption(chart, highestDate) {
+            function updateOption(chart, highestDate, lowestDate) {
                 chart.options.scales.xAxes[0].ticks.max = highestDate;
+                chart.options.scales.xAxes[0].ticks.min = lowestDate;
             }
 
             function addData(chart, data) {
@@ -77,8 +95,12 @@
 				{
 					highestDate = data.x;
 				}
+                if(lowestDate == null)
+                {
+                    lowestDate = data.x;
+                }
 
-                updateOption(chart, highestDate);
+                updateOption(chart, highestDate, lowestDate);
             }
 
             function removeData(chart) {
@@ -93,15 +115,13 @@
 		<script>
 			var socketStatusElement = document.getElementById("webSocketStatus");
 			var socket = new WebSocket("ws://" + window.location.host + "/ws");
-            // removeData(myChart);
 
 			socket.onopen = function () {
-				socketStatusElement.innerHTML = "Status: <b>Connected</b>";
+				socketStatusElement.innerHTML = "Websocket status: <b>Connected</b>";
 			}
 
 			// On receive message
 			socket.onmessage = function (e) {
-
 				data = JSON.parse(e.data);
 				data = [data]
 
@@ -114,12 +134,25 @@
 				myChart.update();
 			}
 
+            socket.onerror = function () {
+				socketStatusElement.innerHTML = "Websocket status: <b>Error</b>";
+            }
+
+            socket.onclose = function () {
+				socketStatusElement.innerHTML = "Websocket status: <b>Connection closed</b>";
+            }
+
 			// Send data
 			function send() {
 
 			}
 
+            function runAlgorithm() {
+                console.log("xx");
+            }
+
 			window.onbeforeunload = function () {
+				socketStatusElement.innerHTML = "Websocket status: <b>Disconnected</b>";
 				socket.close();
 			}
 		</script>

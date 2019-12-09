@@ -44,16 +44,16 @@ var scores []Result
 
 func main() {
 	scores = append(scores, Result{
-		X: time.Now().Add(-time.Second * 1000).Format("12:04:05"),
-		Y: 213,
-	})
-	scores = append(scores, Result{
-		X: time.Now().Format("15:04:05"),
+		X: time.Now().Add(-time.Second * 1000).Format("15:04:05"),
 		Y: 213,
 	})
 	scores = append(scores, Result{
 		X: time.Now().Format("15:04:05"),
 		Y: 2,
+	})
+	scores = append(scores, Result{
+		X: time.Now().Add(time.Second * 1000).Format("15:04:05"),
+		Y: 213,
 	})
 
 	// Serve HTTP
@@ -110,11 +110,20 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 		// StartAlgorithm()
 
 		// Write to client
+		scores = append(scores, Result{
+			X: time.Now().Add(time.Second * 1200).Format("15:04:05"),
+			Y: 100,
+		})
 		err = client.WriteJSON(scores)
 		if err != nil {
 			panic(err)
 		}
-		break
+
+		// Keep connection alive
+		for {
+
+		}
+
 		// }
 
 	}
