@@ -10,7 +10,7 @@ import (
 
 const (
 	populationSize = 20
-	repetition     = 300
+	repetition     = 500
 	// TODO allow configuration of mutation rate, crossover rate etc
 	mutationRate = 0.01
 
@@ -156,14 +156,15 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 	// Store the temporary photo when swapping
 	var swap Photo
 
-	fmt.Println("1.1 Repetition:", repetition)
-
+	// fmt.Println("1.1 Repetition:", repetition)
+	// TODO verify random swap should have at least 1 score in between slide shows
+	//  or else swap with photo of lowest number of tag
 	for i := 0; i < populationSize; i++ {
 		// Store the new instance of slide show
 		newSlideShow := make([]Photo, lenSlideShow)
 		copy(newSlideShow, slideShow)
 
-		fmt.Println("1.2 Repetition:", repetition)
+		// fmt.Println("1.2 Repetition:", repetition)
 
 		// Generate a number for number of mutation from the original slide show
 		numberOfMutation = r.Intn(lenSlideShow / 2)
@@ -173,7 +174,7 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 			numberOfMutation++
 		}
 
-		fmt.Println("1.3 Repetition:", repetition)
+		// fmt.Println("1.3 Repetition:", repetition)
 
 		// Randomly select 2 photo to swap for numberOfMutation iteration
 		for j := 0; j < numberOfMutation; j++ {
@@ -181,12 +182,51 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 			firstPhotoPosition = r.Intn(lenSlideShow)
 			secondPhotoPosition = r.Intn(lenSlideShow)
 
-			fmt.Println("1.4 Repetition:", repetition)
+			// fmt.Println("1.4 Repetition:", repetition)
 
 			// Ensure the 2 positions are unique
 			EnsureUniqueNumber(&firstPhotoPosition, &secondPhotoPosition, lenSlideShow)
 
-			fmt.Println("1.5 Repetition:", repetition)
+			// fmt.Println("1.5 Repetition:", repetition)
+
+			initialScore := 0
+			if len(newSlideShow) > firstPhotoPosition+1 {
+				initialScore += CalcScoreBetweenTwo(newSlideShow[firstPhotoPosition], newSlideShow[firstPhotoPosition+1])
+			}
+
+			if 0 <= firstPhotoPosition-1 {
+				initialScore += CalcScoreBetweenTwo(newSlideShow[firstPhotoPosition], newSlideShow[firstPhotoPosition-1])
+			}
+
+			if len(newSlideShow) > secondPhotoPosition+1 {
+				initialScore += CalcScoreBetweenTwo(newSlideShow[secondPhotoPosition], newSlideShow[secondPhotoPosition+1])
+			}
+
+			if 0 <= secondPhotoPosition-1 {
+				initialScore += CalcScoreBetweenTwo(newSlideShow[secondPhotoPosition], newSlideShow[secondPhotoPosition-1])
+			}
+
+			newScore := 0
+			if len(newSlideShow) > secondPhotoPosition+1 {
+				newScore += CalcScoreBetweenTwo(newSlideShow[firstPhotoPosition], newSlideShow[secondPhotoPosition+1])
+			}
+
+			if 0 <= secondPhotoPosition-1 {
+				newScore += CalcScoreBetweenTwo(newSlideShow[firstPhotoPosition], newSlideShow[secondPhotoPosition-1])
+			}
+
+			if len(newSlideShow) > firstPhotoPosition+1 {
+				newScore += CalcScoreBetweenTwo(newSlideShow[secondPhotoPosition], newSlideShow[firstPhotoPosition+1])
+			}
+
+			if 0 <= firstPhotoPosition-1 {
+				newScore += CalcScoreBetweenTwo(newSlideShow[secondPhotoPosition], newSlideShow[firstPhotoPosition-1])
+			}
+
+			if initialScore > newScore {
+				j--
+				continue
+			}
 
 			// Swap the photo
 			swap = newSlideShow[firstPhotoPosition]
@@ -194,36 +234,44 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 			newSlideShow[secondPhotoPosition] = swap
 		}
 
-		fmt.Println("1.6 Repetition:", repetition)
+		// fmt.Println("1.6 Repetition:", repetition)
 
 		// Store the new slide show into the population
 		set = append(set, newSlideShow)
 	}
 
 	// 2. Calculate and pick the fittest slide show
-	fmt.Println("2.0 Repetition:", repetition)
+	// fmt.Println("2.0 Repetition:", repetition)
 
 	// Store the fittest genetic
 	fittestSlideShow := 0
+	secondFittestSlideShow := 0
 	highestScore := 0
+	secondHighestScore := 0
 
 	// Traverse to all slide shows of population and get the fittest slide show in set
 	for k := range set {
 		if CalcScore(set[k]) > highestScore {
+			secondFittestSlideShow = fittestSlideShow
+			secondHighestScore = highestScore
+
 			fittestSlideShow = k
+			highestScore = CalcScore(set[k])
+		} else if CalcScore(set[k]) > secondHighestScore {
+			secondFittestSlideShow = k
+			highestScore = CalcScore(set[k])
 		}
 	}
 
 	// 3. Create an offspring from the fittest slide show and a random slide show
-	fmt.Println("3.0 Repetition:", repetition)
+	// fmt.Println("3.0 Repetition:", repetition)
 
 	// The random slide show selected could be the fittest slide show as well,
 	// which will cause the new offspring to have
 	// the same gene as the fittest slide show prior to mutation
 
-	// Get the random parent
-	// TODO select a better parent ex: second highest score slide show
-	randomParent := set[r.Intn(len(set))]
+	// Get the second best parent
+	randomParent := set[secondFittestSlideShow]
 
 	// Mate the two parents:
 	// Select a random point and length in the first parent
@@ -272,13 +320,14 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 		offSpringIDList[p.id] = struct{}{}
 	}
 
-	// offspring = set[fittestSlideShow]
-
 	// 4. Mutate the offspring
-	fmt.Println("4.0 Repetition:", repetition)
+	// fmt.Println("4.0 Repetition:", repetition)
 
 	numberOfMutation = r.Intn(lenSlideShow / 2)
-	numberOfMutation = 1
+	numberOfMutation = r.Intn(3)
+	if numberOfMutation > 0 {
+		numberOfMutation = 1
+	}
 	for i := 0; i < numberOfMutation; i++ {
 		// Get 2 random photo in the slide show to swap
 		firstPhotoPosition = r.Intn(lenSlideShow)
@@ -293,7 +342,7 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 	}
 
 	// 5. Repeat by adding mutated offspring to the population set
-	fmt.Println("5.0 Repetition:", repetition)
+	// fmt.Println("5.0 Repetition:", repetition)
 
 	// Send max score to the UI and record highest slide show
 	highestSlideShow := slideShow
