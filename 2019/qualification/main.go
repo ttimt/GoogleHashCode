@@ -40,9 +40,15 @@ type Result struct {
 	Y int    `json:"y"` // the score
 }
 
+// Message
+type Message struct {
+	Action string      `json:"action"`
+	Data   interface{} `json:"data"`
+}
+
 var scores []Result
 var client *websocket.Conn
-var broadcast = make(chan Result)
+var broadcast = make(chan Message)
 
 func main() {
 	// Serve HTTP
@@ -82,7 +88,8 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 	client = ws
 
 	// Start using web socket
-	m := make(map[string]bool)
+	m := Message{}
+
 	for {
 		// Read action from user
 		err := ws.ReadJSON(&m)
@@ -99,14 +106,25 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 			break
 		} else {
 			// Message read success
-			if m["send"] {
+			if m.Action == "send" && m.Data.(bool) {
 				// StartAlgorithm()
+				fmt.Println("starting algorithm")
 			}
 
-			broadcast <- Result{
-				X: time.Now().Format("15:04:05"),
-				Y: 135,
+			// broadcast <- Message{
+			// 	Action: "data",
+			// 	Data: Result{
+			// 		X: time.Now().Format("15:04:05"),
+			// 		Y: 135,
+			// 	},
+			// }
+			time.Sleep(2 * time.Second)
+			m = Message{
+				Action: "end",
+				Data:   true,
 			}
+
+			broadcast <- m
 		}
 	}
 }
@@ -431,9 +449,12 @@ func GeneticAlgorithm(slideShow, parent []Photo, r *rand.Rand, repetition int) [
 	// 5. Repeat by adding mutated offspring to the population set
 	fmt.Println("5.0 Repetition:", repetition)
 
-	broadcast <- Result{
-		X: time.Now().Format("HH:mm:ss"),
-		Y: CalcScore(offspring),
+	broadcast <- Message{
+		Action: "data",
+		Data: Result{
+			X: time.Now().Format("HH:mm:ss"),
+			Y: CalcScore(offspring),
+		},
 	}
 
 	if repetition != 0 {

@@ -138,7 +138,7 @@
 				data = [data]
 
                 // Check the data if algorithm ends = true, enable button again
-                if(data[0].hasOwnProperty('send') && data[0].send)
+                if(data[0].action == "end" && data[0].data)
                 {
                     EnableButton();
                     return;
@@ -147,10 +147,9 @@
                 console.log(data[0])
 
 				data.forEach( d => {
-                    console.log(d.x)
-				    d.x = moment(d.x, "HH:mm:ss");
+				    d.data.x = moment(d.data.x, "HH:mm:ss");
 
-					addData(myChart, d);
+					addData(myChart, d.data);
 				});
 
 				myChart.update();
@@ -166,14 +165,13 @@
 
 			// Send data
 			function send(dataToSend) {
-                console.log(dataToSend)
                 socket.send(JSON.stringify(dataToSend))
 			}
 
             function runAlgorithm() {
                 DisableButton();
 
-                var dataToSend = {"send": true};
+                var dataToSend = {"action": "send", "data": true};
                 send(dataToSend);
             }
 
