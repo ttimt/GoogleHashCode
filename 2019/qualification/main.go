@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	populationSize = 10
-	repetition     = 50
+	populationSize = 15
+	repetition     = 300
 	mutationRate   = 0.01
 	// filePath       = "qualification_round_2019/a_example.txt"
 	// filePath       = "qualification_round_2019/b_lovely_landscapes.txt"
@@ -465,7 +465,7 @@ func GeneticAlgorithm(slideShow, parent []Photo, r *rand.Rand, repetition int) [
 	}
 
 	if CalcScore(parent) > maxScore {
-		maxScore = CalcScore(set[fittestSlideShow])
+		maxScore = CalcScore(parent)
 	}
 
 	broadcast <- Message{
@@ -478,7 +478,7 @@ func GeneticAlgorithm(slideShow, parent []Photo, r *rand.Rand, repetition int) [
 		repetition--
 
 		// Recursive
-		slideShow = GeneticAlgorithm(offspring, set[fittestSlideShow], r, repetition)
+		slideShow = GeneticAlgorithm(offspring, slideShow, r, repetition)
 	}
 
 	// Return the highest slide show
@@ -488,6 +488,10 @@ func GeneticAlgorithm(slideShow, parent []Photo, r *rand.Rand, repetition int) [
 
 	if CalcScore(set[fittestSlideShow]) > CalcScore(slideShow) {
 		slideShow = set[fittestSlideShow]
+	}
+
+	if CalcScore(parent) > CalcScore(slideShow) {
+		slideShow = parent
 	}
 
 	return slideShow
@@ -515,10 +519,7 @@ func CalcScore(slideShow []Photo) int {
 		currentScore := CalcScoreBetweenTwo(p, slideShow[k])
 
 		score += currentScore
-		// scoreArr = append(scoreArr, currentScore)
 	}
-
-	// fmt.Println(scoreArr)
 
 	return score
 }

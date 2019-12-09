@@ -142,6 +142,7 @@
 
 			socket.onopen = function () {
 				socketStatusElement.innerHTML = "Web socket status: <b>Connected</b>";
+				EnableButton();
 			};
 
 			// On receive message
@@ -174,10 +175,12 @@
 
             socket.onerror = function () {
 				socketStatusElement.innerHTML = "Web socket status: <b>Error</b>";
+				DisableButton();
             };
 
             socket.onclose = function () {
 				socketStatusElement.innerHTML = "Web socket status: <b>Disconnected</b>";
+                DisableButton();
             };
 
 			// Send data
