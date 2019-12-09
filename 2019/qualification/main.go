@@ -9,9 +9,10 @@ import (
 )
 
 const (
-	populationSize = 15
+	populationSize = 20
 	repetition     = 300
-	mutationRate   = 0.01
+	// TODO allow configuration of mutation rate, crossover rate etc
+	mutationRate = 0.01
 
 	// Actions
 	actionMaxScore = "maxScore"
@@ -26,7 +27,7 @@ const (
 	// filePath = "qualification_round_2019/d_pet_pictures.txt"
 )
 
-// Photo
+// Photo store imported photo information
 type Photo struct {
 	orientation      byte // H or V
 	nrOfTag          int
@@ -35,13 +36,13 @@ type Photo struct {
 	id               int
 }
 
-// Timer
+// Result store the result used to send to the UI graph
 type Result struct {
 	X string `json:"x"` // HH::mm:ss
 	Y int    `json:"y"` // the score
 }
 
-// Message
+// Message is a wrapper data struct for communication through web socket
 type Message struct {
 	Action string      `json:"action"`
 	Data   interface{} `json:"data"`
@@ -60,6 +61,7 @@ func main() {
 	select {}
 }
 
+// StartAlgorithm will execute the whole algorithm
 func StartAlgorithm() {
 	// Read file
 	fmt.Println("Importing ......")
@@ -68,16 +70,17 @@ func StartAlgorithm() {
 
 	// Assign vertical
 	fmt.Println("Assigning vertical photos ......")
-	answer := AssignVertical(photos)
+	photos = AssignVertical(photos)
 
 	// Genetic algorithm
 	fmt.Println("Running algorithm ......")
-	answer = GeneticAlgorithm(answer, rand.New(rand.NewSource(time.Now().Unix())), repetition)
+	photos = GeneticAlgorithm(photos, rand.New(rand.NewSource(time.Now().Unix())), repetition)
 
 	// Final score
 	fmt.Println("Final score:")
-	fmt.Println(CalcScore(answer))
+	fmt.Println(CalcScore(photos))
 
+	// Notify the UI that algorithm has ended
 	m := Message{
 		Action: actionEnd,
 		Data:   true,
@@ -85,6 +88,7 @@ func StartAlgorithm() {
 	broadcast <- m
 }
 
+// AssignVertical assign vertical photos
 func AssignVertical(photos []Photo) (answer []Photo) {
 	var singleVertical []Photo
 
@@ -105,49 +109,30 @@ func AssignVertical(photos []Photo) (answer []Photo) {
 	// Process all vertical images
 	for k, v := range singleVertical {
 		// Process current image
-		if !v.isUsedAsVertical {
-			// If no vertical image left, discard this image from use
-			if k+1 == len(singleVertical) {
-				break
-			}
-
-			// Pick another vertical photo to form a slide
-			for j, v1 := range singleVertical[k+1:] {
-				if !v1.isUsedAsVertical && CalcScoreBetweenTwo(v, v1) > 0 {
-					// Append v1 into v
-					AppendVerticalPhoto(&singleVertical[k], &singleVertical[k+1+j])
-
-					singleVertical[k].isUsedAsVertical = true
-					singleVertical[k+1+j].isUsedAsVertical = true
-
-					answer = append(answer, singleVertical[k])
-
-					break
-				}
-			}
-		}
-	}
-
-	// Process all remaining images (Like those left because their score with other vertical images are all zero)
-	for k, v := range singleVertical {
+		// If no vertical image left, discard this image from use
 		if !v.isUsedAsVertical && k+1 < len(singleVertical) {
+			// Pick another vertical photo to form a slide
+			smallestOverlapPhotoPosition := k + 1
+			smallestOverlap := CalcNumberOfOverlapTags(v, singleVertical[k+1])
+
+			// Find the one with least overlap
 			for j, v1 := range singleVertical[k+1:] {
-				if !v1.isUsedAsVertical {
-					// Append next unassigned vertical photo to v
-					AppendVerticalPhoto(&singleVertical[k], &singleVertical[k+1+j])
-
-					singleVertical[k].isUsedAsVertical = true
-					singleVertical[k+1+j].isUsedAsVertical = true
-
-					break
+				if !v1.isUsedAsVertical && CalcNumberOfOverlapTags(v, v1) < smallestOverlap {
+					smallestOverlapPhotoPosition = k + 1 + j
+					smallestOverlap = CalcNumberOfOverlapTags(v, v1)
 				}
 			}
+
+			// Append smallestOverlapPhoto into v
+			AppendVerticalPhoto(&singleVertical[k], &singleVertical[smallestOverlapPhotoPosition])
+			answer = append(answer, singleVertical[k])
 		}
 	}
 
 	return
 }
 
+// GeneticAlgorithm is the optimization algorithm
 func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 	// 1. Generate population / a set of slide shows
 	// 2. Pick the fittest
@@ -237,6 +222,7 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 	// the same gene as the fittest slide show prior to mutation
 
 	// Get the random parent
+	// TODO select a better parent ex: second highest score slide show
 	randomParent := set[r.Intn(len(set))]
 
 	// Mate the two parents:
@@ -286,11 +272,13 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 		offSpringIDList[p.id] = struct{}{}
 	}
 
+	// offspring = set[fittestSlideShow]
+
 	// 4. Mutate the offspring
 	fmt.Println("4.0 Repetition:", repetition)
 
 	numberOfMutation = r.Intn(lenSlideShow / 2)
-
+	numberOfMutation = 1
 	for i := 0; i < numberOfMutation; i++ {
 		// Get 2 random photo in the slide show to swap
 		firstPhotoPosition = r.Intn(lenSlideShow)
@@ -307,25 +295,22 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 	// 5. Repeat by adding mutated offspring to the population set
 	fmt.Println("5.0 Repetition:", repetition)
 
-	broadcast <- Message{
-		Action: actionData,
-		Data: Result{
-			X: time.Now().Format("15:04:05"),
-			Y: CalcScore(offspring),
-		},
-	}
+	// Send max score to the UI and record highest slide show
+	highestSlideShow := slideShow
 
-	// Send max score to the UI
 	if CalcScore(slideShow) > maxScore {
 		maxScore = CalcScore(slideShow)
+		highestSlideShow = slideShow
 	}
 
 	if CalcScore(offspring) > maxScore {
 		maxScore = CalcScore(offspring)
+		highestSlideShow = offspring
 	}
 
 	if CalcScore(set[fittestSlideShow]) > maxScore {
 		maxScore = CalcScore(set[fittestSlideShow])
+		highestSlideShow = set[fittestSlideShow]
 	}
 
 	broadcast <- Message{
@@ -333,25 +318,27 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 		Data:   maxScore,
 	}
 
+	broadcast <- Message{
+		Action: actionData,
+		Data: Result{
+			X: time.Now().Format("15:04:05"),
+			Y: maxScore,
+		},
+	}
+
 	// If there are any more repetition, call it again
 	if repetition != 0 {
 		repetition--
 
 		// Recursive
-		slideShow = GeneticAlgorithm(offspring, r, repetition)
+		// TODO pass offspring to next generation even if parent has better score to avoid local optimum
+		highestSlideShow = GeneticAlgorithm(highestSlideShow, r, repetition)
 	}
 
-	// Return the highest slide show
-	if CalcScore(offspring) > CalcScore(slideShow) {
-		slideShow = offspring
-	}
-
-	if CalcScore(set[fittestSlideShow]) > CalcScore(slideShow) {
-		slideShow = set[fittestSlideShow]
-	}
-	return slideShow
+	return highestSlideShow
 }
 
+// CalcScore is the fitness score calculator
 func CalcScore(slideShow []Photo) (score int) {
 	if len(slideShow) <= 1 {
 		return 0

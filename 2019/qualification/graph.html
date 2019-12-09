@@ -12,9 +12,13 @@
     </head>
     <body>
         <div style="width: 100%; top: 3%; left: 2%; right: 2%; position: absolute;">
-            <div style="float: left; width: 70%; height: 650px"><canvas id="myChart" width="100%" height="100%"></canvas></div>
-            <div style="margin-left: 200px; position: relative; text-align: center;">
-                <div id="webSocketStatus">Web socket status: <b>Disconnected</b></div><br/>
+            <div style="float: left; width: 80%; height: 700px; position: relative;">
+                <canvas id="myChart" width="100%" height="100%"></canvas>
+            </div>
+
+            <div style="margin-left: 70%; position: relative; text-align: center;">
+                <div id="webSocketStatus">Web socket status: <b>Disconnected</b></div>
+                <br/>
 
                 <div class="ui animated blue button" tabindex="0" id="runAlgorithmButton" onclick="runAlgorithm()">
                     <div class="visible content">Run algorithm</div>
@@ -23,20 +27,24 @@
                     </div>
                 </div>
 
-                <div style="margin: 15px;">Highest score: <div id="maxScore"><b>0</b></div></div><br/>
+                <div style="margin: 15px;">Highest score:
+                    <div id="maxScore"><b>0</b></div>
+                </div>
+                <br/>
             </div>
         </div>
 
         <script>
             var highestDate = moment().set({
-				'year': 0,
-				'month': 0,
-				'date': 0,
-				'hour': 0,
-				'minute': 0,
-				'second': 0,
-				'millisecond': 0
-			});
+                'year': 0,
+                'month': 0,
+                'date': 0,
+                'hour': 0,
+                'minute': 0,
+                'second': 0,
+                'millisecond': 0
+            });
+
             var lowestDate = null;
 
             var ctx = document.getElementById('myChart').getContext('2d');
@@ -83,8 +91,8 @@
                             }
                         }]
                     },
-					responsive: true,
-					maintainAspectRatio: false
+                    responsive: true,
+                    maintainAspectRatio: false
                 }
             });
 
@@ -96,17 +104,14 @@
             function addData(chart, data) {
                 chart.data.datasets[0].data.push(data);
 
-				if(data.x > highestDate)
-				{
-					highestDate = data.x;
-				}
-                if(lowestDate == null)
-                {
+                if (data.x > highestDate) {
+                    highestDate = data.x;
+                }
+                if (lowestDate == null) {
                     lowestDate = data.x;
                 }
 
-                if( chart.data.datasets[0].data.length >= 150)
-                {
+                if (chart.data.datasets[0].data.length >= 150) {
                     removeOneData(chart);
                     lowestDate = chart.data.datasets[0].data[lastDeletePosition].x;
                 }
@@ -115,10 +120,9 @@
             }
 
             function removeData(chart) {
-            	while(chart.data.datasets[0].data.length > 0)
-				{
-					chart.data.datasets[0].data.pop();
-				}
+                while (chart.data.datasets[0].data.length > 0) {
+                    chart.data.datasets[0].data.pop();
+                }
             }
 
             function removeOneData(chart) {
@@ -126,37 +130,33 @@
                 lastDeletePosition++;
             }
 
-            function DisableButton()
-            {
+            function DisableButton() {
                 $('#runAlgorithmButton').addClass("disabled");
             }
 
-            function EnableButton()
-            {
+            function EnableButton() {
                 $('#runAlgorithmButton').removeClass("disabled");
             }
         </script>
-		<script>
-			var socketStatusElement = document.getElementById("webSocketStatus");
-			var socket = new WebSocket("ws://" + window.location.host + "/ws");
+        <script>
+            var socketStatusElement = document.getElementById("webSocketStatus");
+            var socket = new WebSocket("ws://" + window.location.host + "/ws");
 
-			socket.onopen = function () {
-				socketStatusElement.innerHTML = "Web socket status: <b>Connected</b>";
-				EnableButton();
-			};
+            socket.onopen = function () {
+                socketStatusElement.innerHTML = "Web socket status: <b>Connected</b>";
+                EnableButton();
+            };
 
-			// On receive message
-			socket.onmessage = function (e) {
-				data = JSON.parse(e.data);
-				data = [data];
+            // On receive message
+            socket.onmessage = function (e) {
+                data = JSON.parse(e.data);
+                data = [data];
 
                 // Check the data if algorithm ends = true, enable button again
-                if(data[0].action === "end" && data[0].data)
-                {
+                if (data[0].action === "end" && data[0].data) {
                     EnableButton();
                     return;
-                } else if(data[0].action === "maxScore")
-                {
+                } else if (data[0].action === "maxScore") {
                     document.getElementById("maxScore").innerHTML = data[0].data;
                     return;
                 }
@@ -164,29 +164,29 @@
                 // Make sure button remains disabled even if refresh pressed
                 DisableButton();
 
-				data.forEach( d => {
-				    d.data.x = moment(d.data.x, "HH:mm:ss");
+                data.forEach(d => {
+                    d.data.x = moment(d.data.x, "HH:mm:ss");
 
-					addData(myChart, d.data);
-				});
+                    addData(myChart, d.data);
+                });
 
-				myChart.update();
-			};
-
-            socket.onerror = function () {
-				socketStatusElement.innerHTML = "Web socket status: <b>Error</b>";
-				DisableButton();
+                myChart.update();
             };
 
-            socket.onclose = function () {
-				socketStatusElement.innerHTML = "Web socket status: <b>Disconnected</b>";
+            socket.onerror = function () {
+                socketStatusElement.innerHTML = "Web socket status: <b>Error</b>";
                 DisableButton();
             };
 
-			// Send data
-			function send(dataToSend) {
+            socket.onclose = function () {
+                socketStatusElement.innerHTML = "Web socket status: <b>Disconnected</b>";
+                DisableButton();
+            };
+
+            // Send data
+            function send(dataToSend) {
                 socket.send(JSON.stringify(dataToSend))
-			}
+            }
 
             function runAlgorithm() {
                 DisableButton();
@@ -197,16 +197,16 @@
             }
 
             function resetAll() {
-			    removeData(myChart);
-			    lowestDate = null;
+                removeData(myChart);
+                lowestDate = null;
                 document.getElementById("maxScore").innerHTML = "0";
-			    myChart.update();
+                myChart.update();
             }
 
-			window.onbeforeunload = function () {
-				socketStatusElement.innerHTML = "Web socket status: <b>Disconnected</b>";
-				socket.close();
-			}
-		</script>
+            window.onbeforeunload = function () {
+                socketStatusElement.innerHTML = "Web socket status: <b>Disconnected</b>";
+                socket.close();
+            }
+        </script>
     </body>
 </html>
