@@ -14,13 +14,15 @@
         <div style="width: 100%; top: 3%; left: 2%; right: 2%; position: absolute;">
             <div style="float: left; width: 60%; height: 600px"><canvas id="myChart" width="60%" height="100%"></canvas></div>
             <div style="margin-left: 200px; position: relative; text-align: center;">
-                <p id="webSocketStatus">Websocket status: <b>Disconnected</b></p>
-                <div class="ui animated blue button" tabindex="0" onclick="runAlgorithm()">
-                    <div class="visible content" id="webSocketStatus">Run algorithm</b></div>
+                <div id="webSocketStatus">Websocket status: <b>Disconnected</b></div><br/>
+
+                <div class="ui animated blue button" tabindex="0" id="runAlgorithmButton" onclick="runAlgorithm()">
+                    <div class="visible content">Run algorithm</b></div>
                     <div class="hidden content">
                         <i class="play icon"></i>
                     </div>
                 </div>
+
             </div>
         </div>
 
@@ -111,6 +113,16 @@
 
                 chart.update();
             }
+
+            function DisableButton()
+            {
+                $('#runAlgorithmButton').addClass("disabled");
+            }
+
+            function EnableButton()
+            {
+                $('#runAlgorithmButton').removeClass("disabled");
+            }
         </script>
 		<script>
 			var socketStatusElement = document.getElementById("webSocketStatus");
@@ -125,11 +137,21 @@
 				data = JSON.parse(e.data);
 				data = [data]
 
-				data[0].forEach( d => {
+                // Check the data if algorithm ends = true, enable button again
+                if(data[0].hasOwnProperty('send') && data[0].send)
+                {
+                    EnableButton();
+                    return;
+                }
+
+                console.log(data[0])
+
+				data.forEach( d => {
+                    console.log(d.x)
 				    d.x = moment(d.x, "HH:mm:ss");
 
 					addData(myChart, d);
-				})
+				});
 
 				myChart.update();
 			}
@@ -139,16 +161,20 @@
             }
 
             socket.onclose = function () {
-				socketStatusElement.innerHTML = "Websocket status: <b>Connection closed</b>";
+				socketStatusElement.innerHTML = "Websocket status: <b>Disconnected</b>";
             }
 
 			// Send data
-			function send() {
-
+			function send(dataToSend) {
+                console.log(dataToSend)
+                socket.send(JSON.stringify(dataToSend))
 			}
 
             function runAlgorithm() {
-                console.log("xx");
+                DisableButton();
+
+                var dataToSend = {"send": true};
+                send(dataToSend);
             }
 
 			window.onbeforeunload = function () {

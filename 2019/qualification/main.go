@@ -41,23 +41,13 @@ type Result struct {
 }
 
 var scores []Result
+var client *websocket.Conn
+var broadcast = make(chan Result)
 
 func main() {
-	scores = append(scores, Result{
-		X: time.Now().Add(-time.Second * 1000).Format("15:04:05"),
-		Y: 213,
-	})
-	scores = append(scores, Result{
-		X: time.Now().Format("15:04:05"),
-		Y: 2,
-	})
-	scores = append(scores, Result{
-		X: time.Now().Add(time.Second * 1000).Format("15:04:05"),
-		Y: 213,
-	})
-
 	// Serve HTTP
 	go ServeHTTP()
+	go WriteMessage()
 
 	select {}
 }
@@ -89,43 +79,46 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 	defer ws.Close()
 
 	// Retrieve the client
-	client := ws
+	client = ws
 
 	// Start using web socket
+	m := make(map[string]bool)
 	for {
 		// Read action from user
+		err := ws.ReadJSON(&m)
 		// _, m, err := ws.ReadMessage()
-		//
-		// if err != nil {
-		// 	if !websocket.IsCloseError(err, websocket.CloseNormalClosure,
-		// 		websocket.CloseGoingAway,
-		// 		websocket.CloseNoStatusReceived) {
-		// 		log.Println("ReadConnection:", err)
-		// 	} else {
-		// 		log.Println("Connection closed")
-		// 	}
-		// 	break
-		// } else {
-		// Message read success
-		// StartAlgorithm()
 
-		// Write to client
-		scores = append(scores, Result{
-			X: time.Now().Add(time.Second * 1200).Format("15:04:05"),
-			Y: 100,
-		})
-		err = client.WriteJSON(scores)
+		if err != nil {
+			if !websocket.IsCloseError(err, websocket.CloseNormalClosure,
+				websocket.CloseGoingAway,
+				websocket.CloseNoStatusReceived) {
+				log.Println("ReadConnection:", err)
+			} else {
+				log.Println("Connection closed")
+			}
+			break
+		} else {
+			// Message read success
+			if m["send"] {
+				// StartAlgorithm()
+			}
+
+			broadcast <- Result{
+				X: time.Now().Format("15:04:05"),
+				Y: 135,
+			}
+		}
+	}
+}
+
+func WriteMessage() {
+	for {
+		value := <-broadcast
+
+		err := client.WriteJSON(value)
 		if err != nil {
 			panic(err)
 		}
-
-		// Keep connection alive
-		for {
-
-		}
-
-		// }
-
 	}
 }
 
@@ -437,6 +430,11 @@ func GeneticAlgorithm(slideShow, parent []Photo, r *rand.Rand, repetition int) [
 
 	// 5. Repeat by adding mutated offspring to the population set
 	fmt.Println("5.0 Repetition:", repetition)
+
+	broadcast <- Result{
+		X: time.Now().Format("HH:mm:ss"),
+		Y: CalcScore(offspring),
+	}
 
 	if repetition != 0 {
 		repetition--
