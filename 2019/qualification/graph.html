@@ -12,17 +12,18 @@
     </head>
     <body>
         <div style="width: 100%; top: 3%; left: 2%; right: 2%; position: absolute;">
-            <div style="float: left; width: 60%; height: 600px"><canvas id="myChart" width="60%" height="100%"></canvas></div>
+            <div style="float: left; width: 70%; height: 650px"><canvas id="myChart" width="100%" height="100%"></canvas></div>
             <div style="margin-left: 200px; position: relative; text-align: center;">
-                <div id="webSocketStatus">Websocket status: <b>Disconnected</b></div><br/>
+                <div id="webSocketStatus">Web socket status: <b>Disconnected</b></div><br/>
 
                 <div class="ui animated blue button" tabindex="0" id="runAlgorithmButton" onclick="runAlgorithm()">
-                    <div class="visible content">Run algorithm</b></div>
+                    <div class="visible content">Run algorithm</div>
                     <div class="hidden content">
                         <i class="play icon"></i>
                     </div>
                 </div>
 
+                <div style="margin: 15px;">Highest score: <div id="maxScore"><b>0</b></div></div><br/>
             </div>
         </div>
 
@@ -41,6 +42,8 @@
             var ctx = document.getElementById('myChart').getContext('2d');
 
             var data = [];
+
+            var lastDeletePosition = 0;
 
             var myChart = new Chart(ctx, {
                 type: 'line',
@@ -102,6 +105,12 @@
                     lowestDate = data.x;
                 }
 
+                if( chart.data.datasets[0].data.length >= 150)
+                {
+                    removeOneData(chart);
+                    lowestDate = chart.data.datasets[0].data[lastDeletePosition].x;
+                }
+
                 updateOption(chart, highestDate, lowestDate);
             }
 
@@ -110,8 +119,11 @@
 				{
 					chart.data.datasets[0].data.pop();
 				}
+            }
 
-                chart.update();
+            function removeOneData(chart) {
+                chart.data.datasets[0].data[lastDeletePosition] = {};
+                lastDeletePosition++;
             }
 
             function DisableButton()
@@ -129,22 +141,27 @@
 			var socket = new WebSocket("ws://" + window.location.host + "/ws");
 
 			socket.onopen = function () {
-				socketStatusElement.innerHTML = "Websocket status: <b>Connected</b>";
-			}
+				socketStatusElement.innerHTML = "Web socket status: <b>Connected</b>";
+			};
 
 			// On receive message
 			socket.onmessage = function (e) {
 				data = JSON.parse(e.data);
-				data = [data]
+				data = [data];
 
                 // Check the data if algorithm ends = true, enable button again
-                if(data[0].action == "end" && data[0].data)
+                if(data[0].action === "end" && data[0].data)
                 {
                     EnableButton();
                     return;
+                } else if(data[0].action === "maxScore")
+                {
+                    document.getElementById("maxScore").innerHTML = data[0].data;
+                    return;
                 }
 
-                console.log(data[0])
+                // Make sure button remains disabled even if refresh pressed
+                DisableButton();
 
 				data.forEach( d => {
 				    d.data.x = moment(d.data.x, "HH:mm:ss");
@@ -153,15 +170,15 @@
 				});
 
 				myChart.update();
-			}
+			};
 
             socket.onerror = function () {
-				socketStatusElement.innerHTML = "Websocket status: <b>Error</b>";
-            }
+				socketStatusElement.innerHTML = "Web socket status: <b>Error</b>";
+            };
 
             socket.onclose = function () {
-				socketStatusElement.innerHTML = "Websocket status: <b>Disconnected</b>";
-            }
+				socketStatusElement.innerHTML = "Web socket status: <b>Disconnected</b>";
+            };
 
 			// Send data
 			function send(dataToSend) {
@@ -170,13 +187,21 @@
 
             function runAlgorithm() {
                 DisableButton();
+                resetAll();
 
                 var dataToSend = {"action": "send", "data": true};
                 send(dataToSend);
             }
 
+            function resetAll() {
+			    removeData(myChart);
+			    lowestDate = null;
+                document.getElementById("maxScore").innerHTML = "0";
+			    myChart.update();
+            }
+
 			window.onbeforeunload = function () {
-				socketStatusElement.innerHTML = "Websocket status: <b>Disconnected</b>";
+				socketStatusElement.innerHTML = "Web socket status: <b>Disconnected</b>";
 				socket.close();
 			}
 		</script>

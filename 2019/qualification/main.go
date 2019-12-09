@@ -17,7 +17,7 @@ import (
 
 const (
 	populationSize = 10
-	repetition     = 300
+	repetition     = 50
 	mutationRate   = 0.01
 	// filePath       = "qualification_round_2019/a_example.txt"
 	// filePath       = "qualification_round_2019/b_lovely_landscapes.txt"
@@ -46,9 +46,10 @@ type Message struct {
 	Data   interface{} `json:"data"`
 }
 
-var scores []Result
 var client *websocket.Conn
 var broadcast = make(chan Message)
+var isAlgorithmRunning = false
+var maxScore = 0
 
 func main() {
 	// Serve HTTP
@@ -93,7 +94,6 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 	for {
 		// Read action from user
 		err := ws.ReadJSON(&m)
-		// _, m, err := ws.ReadMessage()
 
 		if err != nil {
 			if !websocket.IsCloseError(err, websocket.CloseNormalClosure,
@@ -106,25 +106,15 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 			break
 		} else {
 			// Message read success
-			if m.Action == "send" && m.Data.(bool) {
-				// StartAlgorithm()
+			if m.Action == "send" && m.Data.(bool) && !isAlgorithmRunning {
 				fmt.Println("starting algorithm")
-			}
+				isAlgorithmRunning = true
+				StartAlgorithm()
 
-			// broadcast <- Message{
-			// 	Action: "data",
-			// 	Data: Result{
-			// 		X: time.Now().Format("15:04:05"),
-			// 		Y: 135,
-			// 	},
-			// }
-			time.Sleep(2 * time.Second)
-			m = Message{
-				Action: "end",
-				Data:   true,
+				// Switch off the flag
+				isAlgorithmRunning = false
+				maxScore = 0
 			}
-
-			broadcast <- m
 		}
 	}
 }
@@ -158,7 +148,11 @@ func StartAlgorithm() {
 	fmt.Println("Final score:")
 	fmt.Println(CalcScore(answer))
 
-	fmt.Println(scores)
+	m := Message{
+		Action: "end",
+		Data:   true,
+	}
+	broadcast <- m
 }
 
 func AssignVertical(photos []Photo) (answer []Photo) {
@@ -432,7 +426,7 @@ func GeneticAlgorithm(slideShow, parent []Photo, r *rand.Rand, repetition int) [
 	fmt.Println("4.0 Repetition:", repetition)
 
 	numberOfMutation = r.Intn(lenSlideShow / 2)
-	numberOfMutation = 1
+
 	for i := 0; i < numberOfMutation; i++ {
 		// Get 2 random photo in the slide show to swap
 		firstPhotoPosition = r.Intn(lenSlideShow)
@@ -452,11 +446,34 @@ func GeneticAlgorithm(slideShow, parent []Photo, r *rand.Rand, repetition int) [
 	broadcast <- Message{
 		Action: "data",
 		Data: Result{
-			X: time.Now().Format("HH:mm:ss"),
+			X: time.Now().Format("15:04:05"),
 			Y: CalcScore(offspring),
 		},
 	}
 
+	// Send max score to the UI
+	if CalcScore(slideShow) > maxScore {
+		maxScore = CalcScore(slideShow)
+	}
+
+	if CalcScore(offspring) > maxScore {
+		maxScore = CalcScore(offspring)
+	}
+
+	if CalcScore(set[fittestSlideShow]) > maxScore {
+		maxScore = CalcScore(set[fittestSlideShow])
+	}
+
+	if CalcScore(parent) > maxScore {
+		maxScore = CalcScore(set[fittestSlideShow])
+	}
+
+	broadcast <- Message{
+		Action: "maxScore",
+		Data:   maxScore,
+	}
+
+	// If there are any more repetition, call it again
 	if repetition != 0 {
 		repetition--
 
@@ -464,6 +481,7 @@ func GeneticAlgorithm(slideShow, parent []Photo, r *rand.Rand, repetition int) [
 		slideShow = GeneticAlgorithm(offspring, set[fittestSlideShow], r, repetition)
 	}
 
+	// Return the highest slide show
 	if CalcScore(offspring) > CalcScore(slideShow) {
 		slideShow = offspring
 	}
@@ -472,41 +490,7 @@ func GeneticAlgorithm(slideShow, parent []Photo, r *rand.Rand, repetition int) [
 		slideShow = set[fittestSlideShow]
 	}
 
-	// DEBUG: Check if scores get better
-	scores = append(scores, Result{
-		X: time.Now().Format("HH:mm:ss"),
-		Y: CalcScore(slideShow),
-	})
-
 	return slideShow
-}
-
-func IsPhotoEqual(photo1, photo2 *Photo) bool {
-	// Compare if two Photo struct are equal
-
-	// Compare orientation
-	if photo1.orientation != photo2.orientation {
-		return false
-	}
-
-	// Compare number of tags
-	if photo1.nrOfTag != photo2.nrOfTag {
-		return false
-	}
-
-	// Compare length of maps
-	if len(photo1.tags) != len(photo2.tags) {
-		return false
-	}
-
-	// Compare tags
-	for k := range photo1.tags {
-		if _, ok := photo2.tags[k]; !ok {
-			return false
-		}
-	}
-
-	return true
 }
 
 func EnsureUniqueNumber(x, y *int, len int) {
