@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	populationSize = 20
-	repetition     = 500
+	populationSize = 25
+	repetition     = 1000
 	// TODO allow configuration of mutation rate, crossover rate etc
 	mutationRate = 0.01
 
@@ -158,7 +158,7 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 
 	// fmt.Println("1.1 Repetition:", repetition)
 	// TODO verify random swap should have at least 1 score in between slide shows
-	//  or else swap with photo of lowest number of tag
+	//  or else attempt a few more times then only swap with photo of lowest number of tag
 	for i := 0; i < populationSize; i++ {
 		// Store the new instance of slide show
 		newSlideShow := make([]Photo, lenSlideShow)
@@ -224,7 +224,7 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 			}
 
 			if initialScore > newScore {
-				j--
+				// j--
 				continue
 			}
 
@@ -324,10 +324,10 @@ func GeneticAlgorithm(slideShow []Photo, r *rand.Rand, repetition int) []Photo {
 	// fmt.Println("4.0 Repetition:", repetition)
 
 	numberOfMutation = r.Intn(lenSlideShow / 2)
-	numberOfMutation = r.Intn(3)
-	if numberOfMutation > 0 {
-		numberOfMutation = 1
-	}
+	// numberOfMutation = r.Intn(7)
+	// if numberOfMutation > 0 {
+	// 	numberOfMutation = 1
+	// }
 	for i := 0; i < numberOfMutation; i++ {
 		// Get 2 random photo in the slide show to swap
 		firstPhotoPosition = r.Intn(lenSlideShow)
