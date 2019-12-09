@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	populationSize = 25
+	populationSize = 100
 	repetition     = 1000
 	// TODO allow configuration of mutation rate, crossover rate etc
 	mutationRate = 0.01
@@ -23,8 +23,9 @@ const (
 	// File paths
 	// filePath = "qualification_round_2019/a_example.txt"
 	// filePath       = "qualification_round_2019/b_lovely_landscapes.txt"
-	filePath = "qualification_round_2019/c_memorable_moments.txt"
+	// filePath = "qualification_round_2019/c_memorable_moments.txt"
 	// filePath = "qualification_round_2019/d_pet_pictures.txt"
+	filePath = "qualification_round_2019/e_shiny_selfies.txt"
 )
 
 // Photo store imported photo information
