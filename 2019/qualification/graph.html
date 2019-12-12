@@ -9,6 +9,9 @@
         <script type="text/javascript" src="jquery-3.4.1.min.js"></script>
         <script type="text/javascript" src="moment.min.js"></script>
         <script type="text/javascript" src="semantic/semantic.min.js"></script>
+        <link rel="stylesheet" href="metroUI/metro-all.min.css">
+        <script src="metroUI/metro.min.js"></script>
+
     </head>
     <body>
         <div style="width: 100%; top: 3%; left: 2%; right: 2%; position: absolute;">
@@ -31,6 +34,10 @@
                     <div id="maxScore"><b>0</b></div>
                 </div>
                 <br/>
+
+                <!-- <div style="margin: 15px;">Mutation rate:-->
+                    <!--   <div id="mutationRate"><b>value slider</b></div>-->
+                    <!--</div>-->
             </div>
         </div>
 
@@ -72,7 +79,7 @@
                         yAxes: [{
                             ticks: {
                                 min: 0,
-                                max: 1800
+                                max: 2000
                             }
                         }],
                         xAxes: [{

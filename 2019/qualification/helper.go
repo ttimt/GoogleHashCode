@@ -67,9 +67,9 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 				fmt.Println("Starting algorithm ......")
 				isAlgorithmRunning = true
 				StartAlgorithm()
+				// StartCategoryAlgorithm()
 
 				// Switch off the flag
-				maxScore = 0
 				isAlgorithmRunning = false
 			}
 		}
@@ -149,6 +149,21 @@ func ReadFile() (photos []Photo, nrOfPhotos int) {
 	return
 }
 
+// WriteFile writes output to a file
+func WriteFile(text string) {
+	fileWriter, err := os.OpenFile("text.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		panic(err)
+	}
+
+	defer fileWriter.Close()
+
+	writer := bufio.NewWriter(fileWriter)
+
+	_, _ = writer.WriteString(text)
+	_, _ = writer.WriteString("\r\n\r\n")
+}
+
 // AppendVerticalPhoto will merge 2 input photos into the first photo
 func AppendVerticalPhoto(photo, photo1 *Photo) {
 	for t := range photo1.tags {
@@ -169,6 +184,21 @@ func CalcNumberOfOverlapTags(photo, photo1 Photo) (total int) {
 		if _, ok := photo1.tags[p1t]; ok {
 			total++
 		}
+	}
+
+	return
+}
+
+// CalcScore is the fitness score calculator
+func CalcScore(slideShow []Photo) (score int) {
+	if len(slideShow) <= 1 {
+		return 0
+	}
+
+	for k, p := range slideShow[1:] {
+		currentScore := CalcScoreBetweenTwo(p, slideShow[k])
+
+		score += currentScore
 	}
 
 	return
