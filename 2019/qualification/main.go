@@ -9,7 +9,7 @@ import (
 
 const (
 	populationSize = 25
-	repetition     = 100
+	repetition     = 1000
 
 	// Actions
 	actionMaxScore = "maxScore"
@@ -57,7 +57,7 @@ var r = rand.New(rand.NewSource(time.Now().Unix()))
 var slideShowLength int
 
 // TODO allow configuration of mutation rate, crossover rate etc
-var mutationRate = 0.1
+var mutationRate = 0.2
 
 func main() {
 	// Serve HTTP

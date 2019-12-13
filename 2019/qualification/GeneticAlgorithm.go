@@ -63,7 +63,7 @@ func GeneratePopulation(slideShow *[]Photo) *[][]Photo {
 			numberOfMutation++
 		}
 
-		numberOfRetry := 0
+		// numberOfRetry := 0
 
 		// Randomly select 2 photo to swap for numberOfMutation iteration
 		for j := 0; j < numberOfMutation; j++ {
@@ -78,7 +78,7 @@ func GeneratePopulation(slideShow *[]Photo) *[][]Photo {
 
 			// fmt.Println("1.5 Repetition:", repetition)
 
-			initialScore := 0
+			initialScore := 5
 			if len(newSlideShow) > firstPhotoPosition+1 {
 				initialScore += CalcScoreBetweenTwo(newSlideShow[firstPhotoPosition], newSlideShow[firstPhotoPosition+1])
 			}
@@ -112,15 +112,20 @@ func GeneratePopulation(slideShow *[]Photo) *[][]Photo {
 				newScore += CalcScoreBetweenTwo(newSlideShow[secondPhotoPosition], newSlideShow[firstPhotoPosition-1])
 			}
 
-			if initialScore > newScore {
+			// if initialScore >= newScore {
+			// 	j--
+			// 	numberOfRetry++
+			//
+			// 	if numberOfRetry > 5 {
+			// 		j++
+			// 		numberOfRetry = 0
+			// 	} else {
+			// 		continue
+			// 	}
+			// }
+			if newScore <= 0 {
 				j--
-				numberOfRetry++
-
-				if numberOfRetry > 5 {
-					j++
-					numberOfRetry = 0
-					continue
-				}
+				continue
 			}
 
 			// Swap the photo
@@ -181,6 +186,10 @@ func CreateOffspring(set *[][]Photo, fittestSlideShowPosition int) []Photo {
 	startPositionFirstParent := r.Intn(slideShowLength / 2)
 	lengthGeneOfFirstParent := r.Intn(slideShowLength - startPositionFirstParent)
 	endPositionFirstParent := startPositionFirstParent + lengthGeneOfFirstParent
+
+	startPositionFirstParent = 0
+	lengthGeneOfFirstParent = slideShowLength * 3 / 4
+	endPositionFirstParent = startPositionFirstParent + lengthGeneOfFirstParent
 
 	// Insert the selected first parent gene into the offspring
 	for _, p := range (*set)[fittestSlideShowPosition][startPositionFirstParent:endPositionFirstParent] {
@@ -246,24 +255,24 @@ func GeneticAlgorithm(slideShow []Photo, repetition int) []Photo {
 		set := GeneratePopulation(&slideShow)
 
 		// 2. Calculate and pick the fittest slide show
-		// fmt.Println("2.0 Repetition:", i)
+		fmt.Println("2.0 Repetition:", i)
 		fittestSlideShowPosition := SelectFittest(set)
 
 		// 3. Create an offspring from the fittest slide show and a random slide show
-		// fmt.Println("3.0 Repetition:", i)
+		fmt.Println("3.0 Repetition:", i)
 		offspring := CreateOffspring(set, fittestSlideShowPosition)
 
-		// 3.5 Set fittest slide show as offspring if the offspring has lower score
-		if CalcScore((*set)[fittestSlideShowPosition]) > CalcScore(offspring) {
-			offspring = (*set)[fittestSlideShowPosition]
-		}
-
 		// 4. Mutate the offspring
-		// fmt.Println("4.0 Repetition:", i)
+		fmt.Println("4.0 Repetition:", i)
 		OffspringMutation(&offspring)
 
+		// 4.5 Set fittest slide show as offspring if the offspring has lower score
+		// if CalcScore((*set)[fittestSlideShowPosition]) > CalcScore(offspring) {
+		// 	offspring = (*set)[fittestSlideShowPosition]
+		// }
+
 		// 5. Repeat by adding mutated offspring to the population set
-		// fmt.Println("5.0 Repetition:", i)
+		fmt.Println("5.0 Repetition:", i)
 		slideShow = offspring
 
 		// Set current offspring score to the UI
