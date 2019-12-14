@@ -10,11 +10,13 @@ import (
 )
 
 const (
-	// filePath = "qualification_round_2018.in/a_example.in"
+	filePath = "qualification_round_2018.in/a_example.in"
 	// filePath = "qualification_round_2018.in/b_should_be_easy.in"
 	// filePath = "qualification_round_2018.in/c_no_hurry.in"
 	// filePath = "qualification_round_2018.in/d_metropolis.in"
-	filePath = "qualification_round_2018.in/e_high_bonus.in"
+	// filePath = "qualification_round_2018.in/e_high_bonus.in"
+
+	maxNr = 10000
 )
 
 type problem struct {
@@ -34,6 +36,8 @@ type ride struct {
 	earliestStart int // the earliest start (0 ≤ s < T)
 	latestEnd     int // the latest finish (0 ≤ f ≤ T) , (f ≥ s + |x − a| + |y − b|)
 	id            int // ID to easily identify each ride
+
+	latestStart int // Latest end - distance
 }
 
 var p problem
@@ -48,6 +52,16 @@ func init() {
 func main() {
 	fmt.Println("Problem:", p)
 	fmt.Println("Rides:", rs)
+
+	runAlgorithm()
+}
+
+func runAlgorithm() {
+
+}
+
+func calcScore() {
+
 }
 
 // ReadFile read the dataset of the problem
@@ -109,6 +123,9 @@ func ReadFile() {
 			id:            id,
 		}
 
+		// Update declarative logic
+		r.updateLatestStart()
+
 		// Add newly created ride to the rides set
 		rs = append(rs, r)
 
@@ -143,4 +160,16 @@ func Max(values ...int) int {
 	}
 
 	return highest
+}
+
+func abs(i int) int {
+	if i < 0 {
+		return -i
+	}
+
+	return i
+}
+
+func (r ride) updateLatestStart() {
+	r.latestStart = r.latestEnd - abs(r.endRow-r.startRow) - abs(r.endColumn-r.startColumn)
 }
