@@ -18,22 +18,22 @@ const (
 )
 
 type problem struct {
-	nrRows             int
-	nrColumns          int
-	nrVehicles         int
-	nrRides            int
-	nrSteps            int
-	perRideOnTimeBonus int
+	nrRows             int // number of rows of the grid (1<=R<=10000)
+	nrColumns          int // number of columns of the grid (1<=C<=10000)
+	nrVehicles         int // number of vehicles in the fleet (1<=F<=1000)
+	nrRides            int // number of rides (1<=N<=10000)
+	nrSteps            int // number of steps in the simulation (1<=T<=10^9)
+	perRideOnTimeBonus int // per-ride bonus for starting the ride on time (1<=B<=10000)
 }
 
 type ride struct {
-	startRow      int
-	startColumn   int
-	endRow        int
-	endColumn     int
-	earliestStart int
-	latestEnd     int
-	id            int
+	startRow      int // the row of the start intersection (0 ≤ a < R)
+	startColumn   int // the column of the start intersection (0 ≤ b < C)
+	endRow        int // the row of the finish intersection (0 ≤ x < R)
+	endColumn     int // the column of the finish intersection (0 ≤ y < C)
+	earliestStart int // the earliest start (0 ≤ s < T)
+	latestEnd     int // the latest finish (0 ≤ f ≤ T) , (f ≥ s + |x − a| + |y − b|)
+	id            int // ID to easily identify each ride
 }
 
 var p problem
@@ -117,4 +117,30 @@ func ReadFile() {
 	}
 
 	return
+}
+
+// Min returns the smallest value from the input parameter
+func Min(values ...int) int {
+	lowest := values[0]
+
+	for _, i := range values[1:] {
+		if i < lowest {
+			lowest = i
+		}
+	}
+
+	return lowest
+}
+
+// Max returns the highest value from the input parameter
+func Max(values ...int) int {
+	highest := values[0]
+
+	for _, i := range values[1:] {
+		if i > highest {
+			highest = i
+		}
+	}
+
+	return highest
 }
