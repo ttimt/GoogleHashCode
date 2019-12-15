@@ -1,5 +1,5 @@
-## Google Hashcode 2019 :
-##### Qualification round
+## Google Hashcode:
+##### Practices with past year archives
 
 `Link: https://codingcompetitions.withgoogle.com/hashcode/archive`
 
@@ -26,3 +26,4 @@
 **What's this**:
 - Google Hashcode competition
 - 2019 Qualification round attempt
+- 2018 Qualification round attempt
