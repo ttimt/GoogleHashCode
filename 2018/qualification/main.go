@@ -10,18 +10,23 @@ import (
 )
 
 // Score : 41,612,200
-// A - 10
-// B - 176,877
-// C - 15,621,263
-// D - 4,348,105
-// E - 21,465,945
+// A - 10 - Perfect
+// B - 176,877 - Perfect
+// C - 15,621,263 -
+// D - 4,348,105 -
+// E - 21,465,945 - Perfect
+//
+// Top #2 score- 49759006
+// C - 15,823,629
+// D - 12,292,545
 
+// My latest step end should be earlier than the other rides latest start
 const (
 	// filePath = "qualification_round_2018.in/a_example.in"
 	// filePath = "qualification_round_2018.in/b_should_be_easy.in"
 	// filePath = "qualification_round_2018.in/c_no_hurry.in"
-	// filePath = "qualification_round_2018.in/d_metropolis.in"
-	filePath = "qualification_round_2018.in/e_high_bonus.in"
+	filePath = "qualification_round_2018.in/d_metropolis.in"
+	// filePath = "qualification_round_2018.in/e_high_bonus.in"
 
 	maxNr = 10000
 )
@@ -81,6 +86,7 @@ func main() {
 	printResult()
 	calcScore()
 	fmt.Println("Total score:", score)
+	// printUnassignedRides()
 }
 
 func runAlgorithm() {
@@ -154,6 +160,16 @@ func debugRides() {
 			fmt.Println("Earliest vehicle:", r.earliestVehicle.id)
 		}
 		fmt.Println()
+	}
+}
+
+func printUnassignedRides() {
+	fmt.Println("Unassigned rides:")
+
+	for k := range rs {
+		if !rs[k].isAssigned {
+			fmt.Println("Ride ID:", rs[k].id)
+		}
 	}
 }
 
@@ -370,7 +386,6 @@ func (r *ride) declarativeUpdateEarliestStep() {
 
 	// Skip
 	if r.earliestStep+r.distance > r.latestEnd {
-		r.isAssigned = true
 		return
 	}
 
