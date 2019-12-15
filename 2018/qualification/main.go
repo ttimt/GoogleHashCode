@@ -231,6 +231,10 @@ func abs(i int) int {
 	return i
 }
 
+func calculateDistance(startRow, startColumn, endRow, endColumn int) int {
+	return abs(endColumn-startColumn) + abs(endRow-startRow)
+}
+
 func getEarliestAvailableVehicle() *vehicle {
 	earliestVehicle := &vs[0]
 
@@ -288,32 +292,34 @@ func (v *vehicle) getLastRide() *ride {
 }
 
 func (v *vehicle) assignRide(r *ride) {
-	r.startStep = max(r.earliestStart, r.startRow+r.startColumn-v.getLastRow()-v.getLastColumn()+v.getLastStep())
 	r.isAssigned = true
 
 	v.rs = append(v.rs, r)
 
+	r.updateStartStep(v)
 	r.declarativeUpdateEndStep()
 	declarativeUpdateAllEarliestStep()
 }
 
 func (r *ride) updateDistance() {
-	r.distance = abs(r.endColumn-r.startColumn) + abs(r.endRow-r.startRow)
+	r.distance = calculateDistance(r.startRow, r.startColumn, r.endRow, r.endColumn)
 }
 
 func (r *ride) updateLatestStart() {
 	r.latestStart = r.latestEnd - r.distance
 }
 
+func (r *ride) updateStartStep(v *vehicle) {
+	r.startStep = max(r.earliestStart, calculateDistance(r.startRow, r.startColumn, v.getLastRow(), v.getLastColumn())+v.getLastStep())
+}
+
 func (r *ride) declarativeUpdateEarliestStep() {
 	lastVehicle := getEarliestAvailableVehicle()
-	previousGrid := lastVehicle.getLastRow() + lastVehicle.getLastColumn()
 
-	r.earliestStep = max(r.startRow+r.startColumn-previousGrid+lastVehicle.getLastStep(), r.earliestStart)
+	r.earliestStep = max(calculateDistance(r.startRow, r.startColumn, lastVehicle.getLastRow(), lastVehicle.getLastColumn())+lastVehicle.getLastStep(),
+		r.earliestStart)
 }
 
 func (r *ride) declarativeUpdateEndStep() {
 	r.endStep = r.startStep + r.distance
 }
-
-// TODO fix row and column calculation
