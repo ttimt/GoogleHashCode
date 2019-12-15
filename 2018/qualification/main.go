@@ -28,6 +28,10 @@ type problem struct {
 	perRideOnTimeBonus int // per-ride bonus for starting the ride on time (1<=B<=10000)
 }
 
+type vehicle struct {
+	rs []*ride
+}
+
 type ride struct {
 	startRow      int // the row of the start intersection (0 ≤ a < R)
 	startColumn   int // the column of the start intersection (0 ≤ b < C)
@@ -37,23 +41,34 @@ type ride struct {
 	latestEnd     int // the latest finish (0 ≤ f ≤ T) , (f ≥ s + |x − a| + |y − b|)
 	id            int // ID to easily identify each ride
 
-	latestStart int // Latest end - distance
+	distance     int  // Distance between end and start point
+	latestStart  int  // Latest end - distance
+	earliestStep int  // max of (0,0), earliest start, and distance from start to previous end plus previous steps
+	startStep    int  // Real start
+	endStep      int  // Real end
+	isAssigned   bool // Is ride assigned to a vehicle
 }
 
 var p problem
+var vs []vehicle
 var rs []ride
 
 func init() {
 	p = problem{}
 
-	ReadFile()
+	readFile()
 }
 
 func main() {
-	fmt.Println("Problem:", p)
-	fmt.Println("Rides:", rs)
-
+	debugProblem()
+	// debugVehicles()
+	// debugRides()
 	runAlgorithm()
+	vs[0].assignRide(&rs[0])
+	vs[1].assignRide(&rs[1])
+	fmt.Println("Ride assigned!")
+	debugVehicles()
+	debugRides()
 }
 
 func runAlgorithm() {
@@ -64,8 +79,44 @@ func calcScore() {
 
 }
 
-// ReadFile read the dataset of the problem
-func ReadFile() {
+func debugProblem() {
+	fmt.Println("Problem:")
+	fmt.Println("Number of rows:", p.nrRows)
+	fmt.Println("Number of columns:", p.nrColumns)
+	fmt.Println("Number of vehicles:", p.nrVehicles)
+	fmt.Println("Number of steps:", p.nrSteps)
+	fmt.Println("On time bonus for a single ride:", p.perRideOnTimeBonus)
+	fmt.Println()
+}
+
+func debugVehicles() {
+	fmt.Println("Vehicles:")
+	for k, v := range vs {
+		fmt.Println("Vehicle index:", k)
+		fmt.Println("Number of rides assigned:", len(v.rs))
+		fmt.Println("Last grid:", v.getLastRow(), v.getLastColumn())
+		fmt.Println("Last step:", v.getLastStep())
+		fmt.Println()
+	}
+}
+
+func debugRides() {
+	fmt.Println("Rides:")
+	for _, r := range rs {
+		fmt.Println("ID:", r.id)
+		fmt.Println("Start grid:", r.startRow, r.startColumn)
+		fmt.Println("End grid:", r.endRow, r.endColumn)
+		fmt.Println("Earliest start & Latest start:", r.earliestStart, r.latestStart)
+		fmt.Println("Latest end:", r.latestEnd)
+		fmt.Println("Earliest step:", r.earliestStep)
+		fmt.Println("Start and end step:", r.startStep, r.endStep)
+		fmt.Println("Distance:", r.distance)
+		fmt.Println("Is assigned:", r.isAssigned)
+		fmt.Println()
+	}
+}
+
+func readFile() {
 	// Define file location
 	fmt.Println("File used:", filePath)
 
@@ -92,6 +143,9 @@ func ReadFile() {
 
 	// Store ID
 	id := 0
+
+	// Create vehicles
+	createVehicles()
 
 	// Read remaining lines: rides
 	for {
@@ -124,7 +178,9 @@ func ReadFile() {
 		}
 
 		// Update declarative logic
+		r.updateDistance()
 		r.updateLatestStart()
+		r.declarativeUpdateEarliestStep()
 
 		// Add newly created ride to the rides set
 		rs = append(rs, r)
@@ -136,8 +192,14 @@ func ReadFile() {
 	return
 }
 
-// Min returns the smallest value from the input parameter
-func Min(values ...int) int {
+func createVehicles() {
+	for i := 0; i < p.nrVehicles; i++ {
+		newVehicle := vehicle{}
+		vs = append(vs, newVehicle)
+	}
+}
+
+func min(values ...int) int {
 	lowest := values[0]
 
 	for _, i := range values[1:] {
@@ -149,8 +211,7 @@ func Min(values ...int) int {
 	return lowest
 }
 
-// Max returns the highest value from the input parameter
-func Max(values ...int) int {
+func max(values ...int) int {
 	highest := values[0]
 
 	for _, i := range values[1:] {
@@ -170,6 +231,89 @@ func abs(i int) int {
 	return i
 }
 
-func (r ride) updateLatestStart() {
-	r.latestStart = r.latestEnd - abs(r.endRow-r.startRow) - abs(r.endColumn-r.startColumn)
+func getEarliestAvailableVehicle() *vehicle {
+	earliestVehicle := &vs[0]
+
+	for k, v := range vs[1:] {
+		if v.getLastStep() < earliestVehicle.getLastStep() {
+			earliestVehicle = &vs[k+1]
+		}
+
+		if earliestVehicle.getLastStep() == 0 {
+			break
+		}
+	}
+
+	return earliestVehicle
 }
+
+func declarativeUpdateAllEarliestStep() {
+	for k, r := range rs {
+		if !r.isAssigned {
+			rs[k].declarativeUpdateEarliestStep()
+		}
+	}
+}
+
+func (v *vehicle) getLastStep() int {
+	if len(v.rs) == 0 {
+		return 0
+	}
+
+	return v.getLastRide().endStep
+}
+
+func (v *vehicle) getLastRow() int {
+	if len(v.rs) == 0 {
+		return 0
+	}
+
+	return v.getLastRide().endRow
+}
+
+func (v *vehicle) getLastColumn() int {
+	if len(v.rs) == 0 {
+		return 0
+	}
+
+	return v.getLastRide().endColumn
+}
+
+func (v *vehicle) getLastRide() *ride {
+	if len(v.rs) == 0 {
+		return nil
+	}
+
+	return v.rs[len(v.rs)-1]
+}
+
+func (v *vehicle) assignRide(r *ride) {
+	r.startStep = max(r.earliestStart, r.startRow+r.startColumn-v.getLastRow()-v.getLastColumn()+v.getLastStep())
+	r.isAssigned = true
+
+	v.rs = append(v.rs, r)
+
+	r.declarativeUpdateEndStep()
+	declarativeUpdateAllEarliestStep()
+}
+
+func (r *ride) updateDistance() {
+	r.distance = abs(r.endColumn-r.startColumn) + abs(r.endRow-r.startRow)
+}
+
+func (r *ride) updateLatestStart() {
+	r.latestStart = r.latestEnd - r.distance
+}
+
+func (r *ride) declarativeUpdateEarliestStep() {
+	lastVehicle := getEarliestAvailableVehicle()
+	previousGrid := lastVehicle.getLastRow() + lastVehicle.getLastColumn()
+
+	r.earliestStep = max(r.startRow+r.startColumn-previousGrid+lastVehicle.getLastStep(), r.earliestStart)
+}
+
+func (r *ride) declarativeUpdateEndStep() {
+	r.endStep = r.startStep + r.distance
+}
+
+// TODO fix row and column calculation
