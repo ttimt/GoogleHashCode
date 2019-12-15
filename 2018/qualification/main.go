@@ -9,12 +9,19 @@ import (
 	"strings"
 )
 
+// Score : 41,612,200
+// A - 10
+// B - 176,877
+// C - 15,621,263
+// D - 4,348,105
+// E - 21,465,945
+
 const (
-	filePath = "qualification_round_2018.in/a_example.in"
+	// filePath = "qualification_round_2018.in/a_example.in"
 	// filePath = "qualification_round_2018.in/b_should_be_easy.in"
 	// filePath = "qualification_round_2018.in/c_no_hurry.in"
 	// filePath = "qualification_round_2018.in/d_metropolis.in"
-	// filePath = "qualification_round_2018.in/e_high_bonus.in"
+	filePath = "qualification_round_2018.in/e_high_bonus.in"
 
 	maxNr = 10000
 )
@@ -30,6 +37,7 @@ type problem struct {
 
 type vehicle struct {
 	rs []*ride
+	id int
 }
 
 type ride struct {
@@ -41,17 +49,22 @@ type ride struct {
 	latestEnd     int // the latest finish (0 ≤ f ≤ T) , (f ≥ s + |x − a| + |y − b|)
 	id            int // ID to easily identify each ride
 
-	distance     int  // Distance between end and start point
-	latestStart  int  // Latest end - distance
-	earliestStep int  // max of (0,0), earliest start, and distance from start to previous end plus previous steps
-	startStep    int  // Real start
-	endStep      int  // Real end
-	isAssigned   bool // Is ride assigned to a vehicle
+	distance        int      // Distance between end and start point
+	latestStart     int      // Latest end - distance
+	earliestEnd     int      // Earliest start + distance
+	earliestStep    int      // max of (0,0), earliest start, and distance from start to previous end plus previous steps
+	startStep       int      // Real start
+	endStep         int      // Real end
+	isAssigned      bool     // Is ride assigned to a vehicle
+	earliestVehicle *vehicle // Store the vehicle used in earliest step calculation
+	assignedVehicle *vehicle // The vehicle if the ride is assigned
 }
 
 var p problem
-var vs []vehicle
-var rs []ride
+var vs []*vehicle
+var rs []*ride
+var earliestStepRide *ride
+var score int
 
 func init() {
 	p = problem{}
@@ -64,19 +77,42 @@ func main() {
 	// debugVehicles()
 	// debugRides()
 	runAlgorithm()
-	vs[0].assignRide(&rs[0])
-	vs[1].assignRide(&rs[1])
 	fmt.Println("Ride assigned!")
-	debugVehicles()
-	debugRides()
+	printResult()
+	calcScore()
+	fmt.Println("Total score:", score)
 }
 
 func runAlgorithm() {
+	for i := 0; i < len(rs); i++ {
+		if earliestStepRide.isAssigned || earliestStepRide.earliestStep+earliestStepRide.distance > p.nrSteps {
+			break
+		}
 
+		earliestStepRide.earliestVehicle.assignRide(earliestStepRide)
+	}
 }
 
 func calcScore() {
+	for kv := range vs {
+		for kr := range vs[kv].rs {
+			score += vs[kv].rs[kr].distance
 
+			if vs[kv].rs[kr].startStep == vs[kv].rs[kr].earliestStart {
+				score += p.perRideOnTimeBonus
+			}
+		}
+	}
+}
+
+func printResult() {
+	for kv := range vs {
+		fmt.Print("Vehicle: ", vs[kv].id, " - Rides: ")
+		for kr := range vs[kv].rs {
+			fmt.Print(" ", vs[kv].rs[kr].id)
+		}
+		fmt.Println()
+	}
 }
 
 func debugProblem() {
@@ -91,8 +127,8 @@ func debugProblem() {
 
 func debugVehicles() {
 	fmt.Println("Vehicles:")
-	for k, v := range vs {
-		fmt.Println("Vehicle index:", k)
+	for _, v := range vs {
+		fmt.Println("Vehicle ID:", v.id)
 		fmt.Println("Number of rides assigned:", len(v.rs))
 		fmt.Println("Last grid:", v.getLastRow(), v.getLastColumn())
 		fmt.Println("Last step:", v.getLastStep())
@@ -107,11 +143,16 @@ func debugRides() {
 		fmt.Println("Start grid:", r.startRow, r.startColumn)
 		fmt.Println("End grid:", r.endRow, r.endColumn)
 		fmt.Println("Earliest start & Latest start:", r.earliestStart, r.latestStart)
-		fmt.Println("Latest end:", r.latestEnd)
-		fmt.Println("Earliest step:", r.earliestStep)
+		fmt.Println("Earliest end & Latest end:", r.earliestEnd, r.latestEnd)
+		fmt.Println("Earliest step & Latest step:", r.earliestStep, r.earliestStep+r.distance)
 		fmt.Println("Start and end step:", r.startStep, r.endStep)
 		fmt.Println("Distance:", r.distance)
 		fmt.Println("Is assigned:", r.isAssigned)
+		if r.isAssigned {
+			fmt.Println("Assigned vehicle:", r.assignedVehicle.id)
+		} else {
+			fmt.Println("Earliest vehicle:", r.earliestVehicle.id)
+		}
 		fmt.Println()
 	}
 }
@@ -167,7 +208,7 @@ func readFile() {
 		latestEnd, _ := strconv.Atoi(lines[5])
 
 		// Create the ride instance
-		r := ride{
+		r := &ride{
 			startRow:      startRow,
 			startColumn:   startColumn,
 			endRow:        endRow,
@@ -180,6 +221,7 @@ func readFile() {
 		// Update declarative logic
 		r.updateDistance()
 		r.updateLatestStart()
+		r.updateEarliestEnd()
 		r.declarativeUpdateEarliestStep()
 
 		// Add newly created ride to the rides set
@@ -193,8 +235,10 @@ func readFile() {
 }
 
 func createVehicles() {
-	for i := 0; i < p.nrVehicles; i++ {
-		newVehicle := vehicle{}
+	for i := 1; i <= p.nrVehicles; i++ {
+		newVehicle := &vehicle{
+			id: i,
+		}
 		vs = append(vs, newVehicle)
 	}
 }
@@ -236,11 +280,11 @@ func calculateDistance(startRow, startColumn, endRow, endColumn int) int {
 }
 
 func getEarliestAvailableVehicle() *vehicle {
-	earliestVehicle := &vs[0]
+	earliestVehicle := vs[0]
 
 	for k, v := range vs[1:] {
 		if v.getLastStep() < earliestVehicle.getLastStep() {
-			earliestVehicle = &vs[k+1]
+			earliestVehicle = vs[k+1]
 		}
 
 		if earliestVehicle.getLastStep() == 0 {
@@ -252,8 +296,8 @@ func getEarliestAvailableVehicle() *vehicle {
 }
 
 func declarativeUpdateAllEarliestStep() {
-	for k, r := range rs {
-		if !r.isAssigned {
+	for k := range rs {
+		if !rs[k].isAssigned {
 			rs[k].declarativeUpdateEarliestStep()
 		}
 	}
@@ -293,10 +337,11 @@ func (v *vehicle) getLastRide() *ride {
 
 func (v *vehicle) assignRide(r *ride) {
 	r.isAssigned = true
+	r.assignedVehicle = v
+	r.updateStartStep(v)
 
 	v.rs = append(v.rs, r)
 
-	r.updateStartStep(v)
 	r.declarativeUpdateEndStep()
 	declarativeUpdateAllEarliestStep()
 }
@@ -309,15 +354,29 @@ func (r *ride) updateLatestStart() {
 	r.latestStart = r.latestEnd - r.distance
 }
 
+func (r *ride) updateEarliestEnd() {
+	r.earliestEnd = r.earliestStart + r.distance
+}
+
 func (r *ride) updateStartStep(v *vehicle) {
 	r.startStep = max(r.earliestStart, calculateDistance(r.startRow, r.startColumn, v.getLastRow(), v.getLastColumn())+v.getLastStep())
 }
 
 func (r *ride) declarativeUpdateEarliestStep() {
 	lastVehicle := getEarliestAvailableVehicle()
+	r.earliestVehicle = lastVehicle
 
-	r.earliestStep = max(calculateDistance(r.startRow, r.startColumn, lastVehicle.getLastRow(), lastVehicle.getLastColumn())+lastVehicle.getLastStep(),
-		r.earliestStart)
+	r.earliestStep = max(calculateDistance(r.startRow, r.startColumn, lastVehicle.getLastRow(), lastVehicle.getLastColumn())+lastVehicle.getLastStep(), r.earliestStart)
+
+	// Skip
+	if r.earliestStep+r.distance > r.latestEnd {
+		r.isAssigned = true
+		return
+	}
+
+	if earliestStepRide == nil || earliestStepRide.isAssigned || r.earliestStep < earliestStepRide.earliestStep {
+		earliestStepRide = r
+	}
 }
 
 func (r *ride) declarativeUpdateEndStep() {
