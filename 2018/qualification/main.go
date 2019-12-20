@@ -92,8 +92,12 @@ func main() {
 	calcScore()
 	fmt.Println("Total score:", score)
 	// printUnassignedRides()
-	// processUnassignedRides()
-	frequencyAnalysis()
+	score = 0
+	fmt.Println("\nProcessing unassigned rides")
+	processUnassignedRides()
+	calcScore()
+	fmt.Println("Total score:", score)
+	// frequencyAnalysis()
 }
 
 func runAlgorithm() {
@@ -328,7 +332,7 @@ func declarativeUpdateAllEarliestStep() {
 }
 
 func (v *vehicle) getLastStep() int {
-	if len(v.rs) == 0 {
+	if v.rs == nil || len(v.rs) == 0 {
 		return 0
 	}
 
@@ -407,11 +411,8 @@ func (r *ride) declarativeUpdateEndStep() {
 }
 
 func processUnassignedRides() {
-	for k := range rs {
-		if !rs[k].isAssigned {
-			// Try to add this ride
-		}
-	}
+	// Removing all rides from a vehicle and reassigning is useless
+
 }
 
 func frequencyAnalysis() {
