@@ -12,11 +12,11 @@ import (
 // Score : 45,643,519 - Position #706
 // A - 10 - Perfect
 // B - 176,877 - Perfect
-// C - 15,770,067 -
-// D - 8,230,620 -
+// C - 15,770,067 - 53,562 more
+// D - 8,230,620 - 4,061,925‬ more
 // E - 21,465,945 - Perfect
 //
-// Top #2 score- 49759006
+// Top #2 score - 49759006
 // C - 15,823,629
 // D - 12,292,545
 
@@ -27,6 +27,13 @@ const (
 	// filePath = "qualification_round_2018.in/c_no_hurry.in"
 	filePath = "qualification_round_2018.in/d_metropolis.in"
 	// filePath = "qualification_round_2018.in/e_high_bonus.in"
+)
+
+const (
+	NW = iota
+	NE
+	SE
+	SW
 )
 
 type problem struct {
@@ -169,7 +176,7 @@ func printUnassignedRides() {
 
 	for k := range rs {
 		if !rs[k].isAssigned {
-			fmt.Println("Ride ID:", rs[k].id, " - distance: ", rs[k].distance)
+			fmt.Println("Ride ID:", rs[k].id, " - distance: ", rs[k].distance, coordinateLocation(rs[k].endRow, rs[k].endColumn))
 		}
 	}
 }
@@ -386,7 +393,7 @@ func (r *ride) declarativeUpdateEarliestStep() {
 	r.earliestStep = max(calculateDistance(r.startRow, r.startColumn, lastVehicle.getLastRow(), lastVehicle.getLastColumn())+lastVehicle.getLastStep(), r.earliestStart)
 
 	// Skip
-	if r.earliestStep+r.distance > r.latestEnd {
+	if r.earliestStep+r.distance > r.latestEnd { // || coordinateLocation(r.endRow, r.endColumn) != SW { + 2 millions points
 		return
 	}
 
@@ -411,27 +418,19 @@ func frequencyAnalysis() {
 	var northWest, northEast, southEast, southWest int
 
 	for k := range rs {
-		if rs[k].startRow <= p.nrRows/2 {
-			// South
-			if rs[k].startColumn <= p.nrColumns/2 {
-				// West
-				southWest++
-			} else {
-				// East
-				southEast++
-			}
-		} else {
-			// North
-			if rs[k].startColumn <= p.nrColumns/2 {
-				// West
-				northWest++
-			} else {
-				// East
-				northEast++
-			}
+		switch coordinateLocation(rs[k].startRow, rs[k].startColumn) {
+		case NW:
+			northWest++
+		case NE:
+			northEast++
+		case SE:
+			southEast++
+		case SW:
+			southWest++
 		}
 	}
 
+	fmt.Println("Frequency analysis")
 	fmt.Println("Start frequency")
 	fmt.Println("North west:", float64(northWest)/float64(p.nrRides))
 	fmt.Println("North east:", float64(northEast)/float64(p.nrRides))
@@ -444,24 +443,15 @@ func frequencyAnalysis() {
 	southEast = 0
 
 	for k := range rs {
-		if rs[k].endRow <= p.nrRows/2 {
-			// South
-			if rs[k].endColumn <= p.nrColumns/2 {
-				// West
-				southWest++
-			} else {
-				// East
-				southEast++
-			}
-		} else {
-			// North
-			if rs[k].endColumn <= p.nrColumns/2 {
-				// West
-				northWest++
-			} else {
-				// East
-				northEast++
-			}
+		switch coordinateLocation(rs[k].endRow, rs[k].endColumn) {
+		case NW:
+			northWest++
+		case NE:
+			northEast++
+		case SE:
+			southEast++
+		case SW:
+			southWest++
 		}
 	}
 
@@ -470,4 +460,26 @@ func frequencyAnalysis() {
 	fmt.Println("North east:", float64(northEast)/float64(p.nrRides))
 	fmt.Println("South east:", float64(southEast)/float64(p.nrRides))
 	fmt.Println("South west:", float64(southWest)/float64(p.nrRides))
+}
+
+func coordinateLocation(row, column int) int {
+	location := 0
+
+	if row <= p.nrRows/2 {
+		// North
+		if column <= p.nrColumns/2 {
+			location = SW
+		} else {
+			location = SE
+		}
+	} else {
+		// South
+		if column <= p.nrColumns/2 {
+			location = NW
+		} else {
+			location = NE
+		}
+	}
+
+	return location
 }
