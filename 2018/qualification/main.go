@@ -9,11 +9,11 @@ import (
 	"strings"
 )
 
-// Score : 45,643,519 - Position #706
+// Score : 47,677,361‬ - Position #412
 // A - 10 - Perfect
 // B - 176,877 - Perfect
 // C - 15,770,067 - 53,562 more
-// D - 8,230,620 - 4,061,925‬ more
+// D - 10,264,462 - 2,028,083‬‬ more
 // E - 21,465,945 - Perfect
 //
 // Top #2 score - 49759006
@@ -75,6 +75,8 @@ var vs []*vehicle
 var rs []*ride
 var earliestStepRide *ride
 var score int
+var endHighestQuadrant int
+var endFrequencyBigGap bool
 
 func init() {
 	p = problem{}
@@ -86,6 +88,7 @@ func main() {
 	debugProblem()
 	// debugVehicles()
 	// debugRides()
+	frequencyAnalysis()
 	runAlgorithm()
 	fmt.Println("Ride assigned!")
 	// printResult()
@@ -97,7 +100,6 @@ func main() {
 	processUnassignedRides()
 	calcScore()
 	fmt.Println("Total score:", score)
-	// frequencyAnalysis()
 }
 
 func runAlgorithm() {
@@ -397,7 +399,7 @@ func (r *ride) declarativeUpdateEarliestStep() {
 	r.earliestStep = max(calculateDistance(r.startRow, r.startColumn, lastVehicle.getLastRow(), lastVehicle.getLastColumn())+lastVehicle.getLastStep(), r.earliestStart)
 
 	// Skip
-	if r.earliestStep+r.distance > r.latestEnd { // || coordinateLocation(r.endRow, r.endColumn) != SW { + 2 millions points
+	if r.earliestStep+r.distance > r.latestEnd || (endFrequencyBigGap && coordinateLocation(r.endRow, r.endColumn) != endHighestQuadrant) { // + 2 millions points
 		return
 	}
 
@@ -412,7 +414,9 @@ func (r *ride) declarativeUpdateEndStep() {
 
 func processUnassignedRides() {
 	// Removing all rides from a vehicle and reassigning is useless
-
+	endFrequencyBigGap = false
+	declarativeUpdateAllEarliestStep()
+	runAlgorithm()
 }
 
 func frequencyAnalysis() {
@@ -461,6 +465,27 @@ func frequencyAnalysis() {
 	fmt.Println("North east:", float64(northEast)/float64(p.nrRides))
 	fmt.Println("South east:", float64(southEast)/float64(p.nrRides))
 	fmt.Println("South west:", float64(southWest)/float64(p.nrRides))
+
+	endHighestQuadrant = NW
+	currentHighest := northWest
+
+	if northEast > currentHighest {
+		endHighestQuadrant = NE
+		currentHighest = northEast
+	} else if southEast > currentHighest {
+		endHighestQuadrant = SE
+		currentHighest = southEast
+	} else if southWest > currentHighest {
+		endHighestQuadrant = SW
+		currentHighest = southWest
+	}
+
+	if 1-float64(currentHighest)/float64(p.nrRides) < 0.15 {
+		endFrequencyBigGap = true
+	}
+
+	fmt.Println("Highest end frequency:", endHighestQuadrant)
+	fmt.Println("End frequency big gap:", endFrequencyBigGap, 1-float64(currentHighest)/float64(p.nrRides))
 }
 
 func coordinateLocation(row, column int) int {
