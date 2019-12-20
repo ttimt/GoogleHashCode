@@ -9,11 +9,11 @@ import (
 	"strings"
 )
 
-// Score : 41,612,200
+// Score : 45,643,519 - Position #706
 // A - 10 - Perfect
 // B - 176,877 - Perfect
-// C - 15,621,263 -
-// D - 4,348,105 -
+// C - 15,770,067 -
+// D - 8,230,620 -
 // E - 21,465,945 - Perfect
 //
 // Top #2 score- 49759006
@@ -24,11 +24,9 @@ import (
 const (
 	// filePath = "qualification_round_2018.in/a_example.in"
 	// filePath = "qualification_round_2018.in/b_should_be_easy.in"
-	// filePath = "qualification_round_2018.in/c_no_hurry.in"
-	filePath = "qualification_round_2018.in/d_metropolis.in"
+	filePath = "qualification_round_2018.in/c_no_hurry.in"
+	// filePath = "qualification_round_2018.in/d_metropolis.in"
 	// filePath = "qualification_round_2018.in/e_high_bonus.in"
-
-	maxNr = 10000
 )
 
 type problem struct {
@@ -83,7 +81,7 @@ func main() {
 	// debugRides()
 	runAlgorithm()
 	fmt.Println("Ride assigned!")
-	printResult()
+	// printResult()
 	calcScore()
 	fmt.Println("Total score:", score)
 	// printUnassignedRides()
@@ -104,6 +102,7 @@ func calcScore() {
 		for kr := range vs[kv].rs {
 			score += vs[kv].rs[kr].distance
 
+			fmt.Print(strconv.Itoa(vs[kv].rs[kr].distance) + " ")
 			if vs[kv].rs[kr].startStep == vs[kv].rs[kr].earliestStart {
 				score += p.perRideOnTimeBonus
 			}
