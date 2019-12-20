@@ -24,8 +24,8 @@ import (
 const (
 	// filePath = "qualification_round_2018.in/a_example.in"
 	// filePath = "qualification_round_2018.in/b_should_be_easy.in"
-	filePath = "qualification_round_2018.in/c_no_hurry.in"
-	// filePath = "qualification_round_2018.in/d_metropolis.in"
+	// filePath = "qualification_round_2018.in/c_no_hurry.in"
+	filePath = "qualification_round_2018.in/d_metropolis.in"
 	// filePath = "qualification_round_2018.in/e_high_bonus.in"
 )
 
@@ -85,6 +85,8 @@ func main() {
 	calcScore()
 	fmt.Println("Total score:", score)
 	// printUnassignedRides()
+	// processUnassignedRides()
+	frequencyAnalysis()
 }
 
 func runAlgorithm() {
@@ -102,7 +104,7 @@ func calcScore() {
 		for kr := range vs[kv].rs {
 			score += vs[kv].rs[kr].distance
 
-			fmt.Print(strconv.Itoa(vs[kv].rs[kr].distance) + " ")
+			// fmt.Print(strconv.Itoa(vs[kv].rs[kr].distance) + " ")
 			if vs[kv].rs[kr].startStep == vs[kv].rs[kr].earliestStart {
 				score += p.perRideOnTimeBonus
 			}
@@ -167,7 +169,7 @@ func printUnassignedRides() {
 
 	for k := range rs {
 		if !rs[k].isAssigned {
-			fmt.Println("Ride ID:", rs[k].id)
+			fmt.Println("Ride ID:", rs[k].id, " - distance: ", rs[k].distance)
 		}
 	}
 }
@@ -395,4 +397,77 @@ func (r *ride) declarativeUpdateEarliestStep() {
 
 func (r *ride) declarativeUpdateEndStep() {
 	r.endStep = r.startStep + r.distance
+}
+
+func processUnassignedRides() {
+	for k := range rs {
+		if !rs[k].isAssigned {
+			// Try to add this ride
+		}
+	}
+}
+
+func frequencyAnalysis() {
+	var northWest, northEast, southEast, southWest int
+
+	for k := range rs {
+		if rs[k].startRow <= p.nrRows/2 {
+			// South
+			if rs[k].startColumn <= p.nrColumns/2 {
+				// West
+				southWest++
+			} else {
+				// East
+				southEast++
+			}
+		} else {
+			// North
+			if rs[k].startColumn <= p.nrColumns/2 {
+				// West
+				northWest++
+			} else {
+				// East
+				northEast++
+			}
+		}
+	}
+
+	fmt.Println("Start frequency")
+	fmt.Println("North west:", float64(northWest)/float64(p.nrRides))
+	fmt.Println("North east:", float64(northEast)/float64(p.nrRides))
+	fmt.Println("South east:", float64(southEast)/float64(p.nrRides))
+	fmt.Println("South west:", float64(southWest)/float64(p.nrRides))
+
+	northEast = 0
+	northWest = 0
+	southWest = 0
+	southEast = 0
+
+	for k := range rs {
+		if rs[k].endRow <= p.nrRows/2 {
+			// South
+			if rs[k].endColumn <= p.nrColumns/2 {
+				// West
+				southWest++
+			} else {
+				// East
+				southEast++
+			}
+		} else {
+			// North
+			if rs[k].endColumn <= p.nrColumns/2 {
+				// West
+				northWest++
+			} else {
+				// East
+				northEast++
+			}
+		}
+	}
+
+	fmt.Println("End frequency")
+	fmt.Println("North west:", float64(northWest)/float64(p.nrRides))
+	fmt.Println("North east:", float64(northEast)/float64(p.nrRides))
+	fmt.Println("South east:", float64(southEast)/float64(p.nrRides))
+	fmt.Println("South west:", float64(southWest)/float64(p.nrRides))
 }
