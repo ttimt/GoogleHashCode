@@ -26,6 +26,8 @@
 <br>
 
 **What's this**:
-- Google Hashcode competition
-- 2019 Qualification round attempt
-- 2018 Qualification round attempt
+- Google Hashcode competition - Past years attempt
+
+**Install package dependency**
+- Install **Yarn** from `https://yarnpkg.com/en/docs/install`
+- Open **CMD** at project root folder and run the command `yarn`
