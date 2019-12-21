@@ -4,6 +4,8 @@
 `Link: https://codingcompetitions.withgoogle.com/hashcode/archive`
 
 ---
+[![DeepSource](https://static.deepsource.io/deepsource-badge-light.svg)](https://deepsource.io/gh/ttimt/GoogleHashCode/?ref=repository-badge)
+
 [![Made with GO](https://forthebadge.com/images/badges/made-with-go.svg)](https://golang.org/)
 [![Uses Badges](https://forthebadge.com/images/badges/uses-badges.svg)](https://github.com/ttimt/urlshort-gophercises)
 

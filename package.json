@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "chart.js": "^2.9.3",
+    "jquery": "^3.4.1"
+  },
+  "name": "GoogleHashCode",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/ttimt/GoogleHashCode.git",
+  "author": "Timothy C. Lam <geroginalam@hotmail.com>",
+  "license": "MIT"
+}
