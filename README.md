@@ -30,4 +30,6 @@
 
 **Install package dependency**
 - Install **Yarn** from `https://yarnpkg.com/en/docs/install`
-- Open **CMD** at project root folder and run the command `yarn`
+- Open **CMD** or **shell** at project root folder and run the command
+
+    `yarn --ignore-scripts`
