@@ -16,7 +16,7 @@ import (
 // ServeHTTP will serve files to HTTP requests
 func ServeHTTP() {
 	// File server
-	fs := http.FileServer(http.Dir("./"))
+	fs := http.FileServer(http.Dir("../../"))
 	http.Handle("/", fs)
 	http.HandleFunc("/ws", HandleConnections)
 
@@ -66,8 +66,8 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 			if m.Action == actionSend && m.Data.(bool) && !isAlgorithmRunning {
 				fmt.Println("Starting algorithm ......")
 				isAlgorithmRunning = true
-				StartAlgorithm()
-				// StartCategoryAlgorithm()
+				// StartAlgorithm()
+				StartCategoryAlgorithm()
 
 				// Switch off the flag
 				isAlgorithmRunning = false
@@ -132,6 +132,10 @@ func ReadFile() (photos []Photo, nrOfPhotos int) {
 			nrOfTag:     nrOfTag,
 			tags:        map[string]struct{}{},
 			id:          id,
+		}
+
+		if nrOfTag > maxNrOfTags {
+			maxNrOfTags = nrOfTag
 		}
 
 		// Assign tags to photo
@@ -243,4 +247,12 @@ func Min(values ...int) int {
 	}
 
 	return lowest
+}
+
+func printSlideShow(photos []Photo) {
+	fmt.Print("Slide show: ")
+	for k := range photos {
+		fmt.Print(photos[k].id, " ")
+	}
+	fmt.Println()
 }

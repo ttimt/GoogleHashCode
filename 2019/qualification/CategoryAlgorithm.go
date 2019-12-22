@@ -17,58 +17,109 @@ func StartCategoryAlgorithm() {
 	// Update photos length
 	slideShowLength = len(photos)
 
+	// Update current score
+	updateAllCurrentScore(photos)
+
 	// Algorithm
-	fmt.Println("Running algorithm ......")
-	maxScore = CalcScore(photos)
-	photos = CategoryAlgorithm(photos)
+	fmt.Println("Running category algorithm ......")
+	fmt.Println("Initial score:", CalcScore(photos))
+	var ok bool
+
+	ite := maxNrOfTags / 2
+	fmt.Println("Iteration to make:", ite)
+	for i := 0; i < ite; i++ {
+		photos, ok = CategoryAlgorithm(photos, i)
+
+		if !ok {
+			break
+		}
+	}
 
 	// Final score
-	fmt.Println("Final score:")
-	fmt.Println(CalcScore(photos))
+	fmt.Println("Final score:", CalcScore(photos))
 
 	// Notify the UI that algorithm has ended
-	m := Message{
-		Action: actionEnd,
-		Data:   true,
-	}
-	broadcast <- m
+	// m := Message{
+	// 	Action: actionEnd,
+	// 	Data:   true,
+	// }
+	// broadcast <- m
 }
 
-func CategoryAlgorithm(slideShow []Photo) []Photo {
-	answer := make([]Photo, slideShowLength)
-	answer = answer[0:1]
+// CategoryAlgorithm greedy
+func CategoryAlgorithm(photos []Photo, i int) ([]Photo, bool) {
+	maxScoreNew := CalcScore(photos)
+	fmt.Println("New score:", maxScoreNew)
+	if maxScore == maxScoreNew {
+		return photos, false
+	} else {
+		maxScore = maxScoreNew
+	}
 
-	photo := &slideShow[0]
-	(*photo).used = true
-	answer = append(answer, *photo)
+	for k := range photos {
+		// fmt.Println("1", " ")
+		currentTotal := 0
 
-	for i := 0; i < slideShowLength; i++ {
-		done := false
-		for j, pp := range slideShow {
-			if !pp.used && CalcScoreBetweenTwo(*photo, pp) >= 3 {
-				answer = append(answer, slideShow[j])
-				slideShow[j].used = true
-				*photo = slideShow[j]
+		for j := range photos {
+			// fmt.Println("2", j)
+			currentTotal = photos[k].currentScore
 
-				done = true
-				fmt.Println("Iteration:", i)
-				break
-			}
-		}
+			if k != j {
+				currentTotal += photos[j].currentScore
 
-		if !done {
-			for j, pp := range slideShow {
-				if !pp.used {
-					answer = append(answer, *photo)
-					slideShow[j].used = true
-					*photo = slideShow[j]
+				// fmt.Println("3", " ")
+				// Get swap score
+				newTotal := 0
+				if k-1 >= 0 {
+					newTotal += CalcScoreBetweenTwo(photos[k-1], photos[j])
+				}
+				if k+1 < len(photos) {
+					newTotal += CalcScoreBetweenTwo(photos[j], photos[k+1])
+				}
+				if j-1 >= 0 {
+					newTotal += CalcScoreBetweenTwo(photos[j-1], photos[k])
+				}
+				if j+1 < len(photos) {
+					newTotal += CalcScoreBetweenTwo(photos[k], photos[j+1])
+				}
 
-					fmt.Println("Iteration:", i)
+				if newTotal > currentTotal {
+					// fmt.Println("4", " ")
+					// fmt.Println("New", newTotal, "Current", currentTotal)
+					// Swap
+					temp := photos[k]
+					photos[k] = photos[j]
+					photos[j] = temp
+
+					photos[k].currentScore = updateCurrentScore(photos, k)
+					photos[j].currentScore = updateCurrentScore(photos, j)
 					break
 				}
+				// fmt.Println("5", " ")
 			}
 		}
 	}
 
-	return answer
+	return photos, true
+}
+
+func updateAllCurrentScore(photos []Photo) {
+	for k := range photos {
+		score := updateCurrentScore(photos, k)
+		photos[k].currentScore = score
+	}
+}
+
+func updateCurrentScore(photos []Photo, pos int) int {
+	score := 0
+
+	if pos-1 >= 0 {
+		score += CalcScoreBetweenTwo(photos[pos-1], photos[pos])
+	}
+
+	if pos+1 < len(photos) {
+		score += CalcScoreBetweenTwo(photos[pos], photos[pos+1])
+	}
+
+	return score
 }

@@ -18,13 +18,13 @@ func AssignVertical(photos []Photo) (answer []Photo) {
 		}
 	}
 
-	fmt.Println("Assign vertical: 2")
+	// fmt.Println("Assign vertical: 2")
 	// Return if no vertical image or only one
 	if len(singleVertical) <= 1 {
 		return answer
 	}
 
-	fmt.Println("Assign vertical: 3")
+	// fmt.Println("Assign vertical: 3")
 	// Process all vertical images
 	for k, v := range singleVertical {
 		// Process current image
@@ -34,12 +34,12 @@ func AssignVertical(photos []Photo) (answer []Photo) {
 			smallestOverlapPhotoPosition := k + 1
 			smallestOverlap := CalcNumberOfOverlapTags(v, singleVertical[k+1])
 
-			fmt.Println("Assign vertical: 4 Image:", k)
+			// fmt.Println("Assign vertical: 4 Image:", k)
 			// Find the one with least overlap
 			// TODO O(n^2) too slow
 			for j, v1 := range singleVertical[k+1:] {
 				if !v1.isUsedAsVertical && CalcNumberOfOverlapTags(v, v1) < smallestOverlap {
-					fmt.Println("Assign vertical: 5 Image:", j)
+					// fmt.Println("Assign vertical: 5 Image:", j)
 					smallestOverlapPhotoPosition = k + 1 + j
 					smallestOverlap = CalcNumberOfOverlapTags(v, v1)
 

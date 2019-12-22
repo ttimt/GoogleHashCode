@@ -7,6 +7,14 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// Result:
+// 2019 Qualification Position:
+// A - 2
+// B - 0
+// C - 1254
+// D - 317856
+// E - 0
+
 const (
 	populationSize = 25
 	repetition     = 1000
@@ -33,6 +41,7 @@ type Photo struct {
 	isUsedAsVertical bool
 	id               int
 	used             bool
+	currentScore     int
 }
 
 // Result store the result used to send to the UI graph
@@ -51,6 +60,8 @@ var client *websocket.Conn
 var broadcast = make(chan Message)
 var isAlgorithmRunning = false
 
+var maxNrOfTags int
+
 // TODO also score the best slide show to match with maxScore
 var maxScore = 0
 var r = rand.New(rand.NewSource(time.Now().Unix()))
@@ -61,8 +72,9 @@ var mutationRate = 0.2
 
 func main() {
 	// Serve HTTP
-	go ServeHTTP()
-	go WriteMessage()
-
-	select {}
+	// go ServeHTTP()
+	// go WriteMessage()
+	//
+	// select {}
+	StartCategoryAlgorithm()
 }
