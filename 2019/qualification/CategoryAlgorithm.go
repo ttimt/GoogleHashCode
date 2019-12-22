@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func StartCategoryAlgorithm() {
+func startCategoryAlgorithm() {
 	// Read file
 	fmt.Println("Importing ......")
 	photos, nrOfPhotos := ReadFile()
@@ -12,10 +12,12 @@ func StartCategoryAlgorithm() {
 
 	// Assign vertical
 	fmt.Println("Assigning vertical photos ......")
-	photos = AssignVertical(photos)
+	// photos = AssignVertical(photos)
+	photos = assignEasyVertical(photos)
 
 	// Update photos length
 	slideShowLength = len(photos)
+	fmt.Println("Slide show length:", slideShowLength)
 
 	// Update current score
 	updateAllCurrentScore(photos)
@@ -26,7 +28,7 @@ func StartCategoryAlgorithm() {
 	var ok bool
 
 	ite := maxNrOfTags / 2
-	fmt.Println("Iteration to make:", ite)
+	fmt.Println("Max iteration to make:", ite)
 	for i := 0; i < ite; i++ {
 		photos, ok = CategoryAlgorithm(photos, i)
 
@@ -64,7 +66,7 @@ func CategoryAlgorithm(photos []Photo, i int) ([]Photo, bool) {
 			// fmt.Println("2", j)
 			currentTotal = photos[k].currentScore
 
-			if k != j {
+			if k != j && currentTotal < maxNrOfTags/2 {
 				currentTotal += photos[j].currentScore
 
 				// fmt.Println("3", " ")

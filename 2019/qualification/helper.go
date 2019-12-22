@@ -67,7 +67,7 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 				fmt.Println("Starting algorithm ......")
 				isAlgorithmRunning = true
 				// StartAlgorithm()
-				StartCategoryAlgorithm()
+				startCategoryAlgorithm()
 
 				// Switch off the flag
 				isAlgorithmRunning = false

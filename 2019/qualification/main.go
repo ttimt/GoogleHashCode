@@ -7,13 +7,20 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// Result:
-// 2019 Qualification Position:
+// Result: 496,783
+// 2019 Qualification Position: #1524
 // A - 2
-// B - 0
-// C - 1254
-// D - 317856
-// E - 0
+// B - 12
+// C - 1,157
+// D - 292,762
+// E - 202,850
+//
+// Best score:
+// A - 2
+// B - 239,997
+// C - 1,775
+// D - 441,242
+// E - 560,550
 
 const (
 	populationSize = 25
@@ -28,8 +35,8 @@ const (
 	// File paths
 	// filePath = "qualification_round_2019/a_example.txt"
 	// filePath = "qualification_round_2019/b_lovely_landscapes.txt"
-	filePath = "qualification_round_2019/c_memorable_moments.txt"
-	// filePath = "qualification_round_2019/d_pet_pictures.txt"
+	// filePath = "qualification_round_2019/c_memorable_moments.txt"
+	filePath = "qualification_round_2019/d_pet_pictures.txt"
 	// filePath = "qualification_round_2019/e_shiny_selfies.txt"
 )
 
@@ -76,5 +83,5 @@ func main() {
 	// go WriteMessage()
 	//
 	// select {}
-	StartCategoryAlgorithm()
+	startCategoryAlgorithm()
 }

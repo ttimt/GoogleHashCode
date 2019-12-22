@@ -59,3 +59,25 @@ func AssignVertical(photos []Photo) (answer []Photo) {
 	fmt.Println("Assign vertical: 6")
 	return
 }
+
+func assignEasyVertical(photos []Photo) (answer []Photo) {
+	// Store unassigned vertical photos
+	var singleVertical []Photo
+
+	for _, p := range photos {
+		if p.orientation != 'V' {
+			answer = append(answer, p)
+		} else {
+			singleVertical = append(singleVertical, p)
+		}
+	}
+
+	for i := 0; i < len(singleVertical); i += 2 {
+		if i+1 < len(singleVertical) {
+			AppendVerticalPhoto(&photos[i], &photos[i+1])
+			answer = append(answer, photos[i])
+		}
+	}
+
+	return
+}
