@@ -8,11 +8,11 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// Result: 496,783
-// 2019 Qualification Position: #1524
+// Result: 702,864‬
+// 2019 Qualification Position: #873
 // A - 2
-// B - 12
-// C - 1,157
+// B - 205,623
+// C - 1,627
 // D - 292,762
 // E - 202,850
 //
@@ -24,8 +24,8 @@ import (
 // E - 560,550
 
 const (
-	populationSize = 25
-	repetition     = 1000
+	populationSize = 15
+	repetition     = 100
 
 	// Actions
 	actionMaxScore = "maxScore"
@@ -34,11 +34,12 @@ const (
 	actionData     = "data"
 
 	// File paths
-	filePathA = "qualification_round_2019/a_example.txt"
-	filePathB = "qualification_round_2019/b_lovely_landscapes.txt"
-	filePathC = "qualification_round_2019/c_memorable_moments.txt"
-	filePathD = "qualification_round_2019/d_pet_pictures.txt"
-	filePathE = "qualification_round_2019/e_shiny_selfies.txt"
+	filePathA = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019/a_example.txt"
+	filePathB = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019/b_lovely_landscapes.txt"
+	filePathC = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019/c_memorable_moments.txt"
+	filePathD = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019/d_pet_pictures.txt"
+	filePathE = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019/e_shiny_selfies.txt"
+	filePathF = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019/f.txt"
 )
 
 // Photo store imported photo information
@@ -83,11 +84,13 @@ func main() {
 	//
 	// select {}
 
-	wg.Add(5)
-	go startCategoryAlgorithm(filePathA)
-	go startCategoryAlgorithm(filePathB)
-	go startCategoryAlgorithm(filePathC)
-	go startCategoryAlgorithm(filePathD)
-	go startCategoryAlgorithm(filePathE)
+	wg.Add(1)
+	// go startTagAlgorithm(filePathA)
+	// go startTagAlgorithm(filePathB)
+	// go startTagAlgorithm(filePathC)
+	go StartAlgorithm(filePathD)
+	// go startCategoryAlgorithm(filePathE)
+
+	// go startTagAlgorithm(filePathF)
 	wg.Wait()
 }

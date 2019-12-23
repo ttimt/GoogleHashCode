@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"time"
 )
 
 // StartAlgorithm will execute the whole algorithm
@@ -64,7 +63,7 @@ func GeneratePopulation(slideShow *[]Photo, slideShowLength int) *[][]Photo {
 			numberOfMutation++
 		}
 
-		// numberOfRetry := 0
+		numberOfRetry := 0
 
 		// Randomly select 2 photo to swap for numberOfMutation iteration
 		for j := 0; j < numberOfMutation; j++ {
@@ -113,21 +112,21 @@ func GeneratePopulation(slideShow *[]Photo, slideShowLength int) *[][]Photo {
 				newScore += CalcScoreBetweenTwo(newSlideShow[secondPhotoPosition], newSlideShow[firstPhotoPosition-1])
 			}
 
-			// if initialScore >= newScore {
-			// 	j--
-			// 	numberOfRetry++
-			//
-			// 	if numberOfRetry > 5 {
-			// 		j++
-			// 		numberOfRetry = 0
-			// 	} else {
-			// 		continue
-			// 	}
-			// }
-			if newScore <= 0 {
+			if initialScore >= newScore {
 				j--
-				continue
+				numberOfRetry++
+
+				if numberOfRetry > 5 {
+					j++
+					numberOfRetry = 0
+				} else {
+					continue
+				}
 			}
+			// if newScore <= 0 {
+			// 	j--
+			// 	continue
+			// }
 
 			// Swap the photo
 			swap = newSlideShow[firstPhotoPosition]
@@ -277,13 +276,13 @@ func GeneticAlgorithm(slideShow []Photo, repetition int, slideShowLength int) []
 		slideShow = offspring
 
 		// Set current offspring score to the UI
-		broadcast <- Message{
-			Action: actionData,
-			Data: Result{
-				X: time.Now().Format("15:04:05"),
-				Y: CalcScore(offspring),
-			},
-		}
+		// broadcast <- Message{
+		// 	Action: actionData,
+		// 	Data: Result{
+		// 		X: time.Now().Format("15:04:05"),
+		// 		Y: CalcScore(offspring),
+		// 	},
+		// }
 
 		// Update max score
 		if CalcScore(offspring) > maxScore {
@@ -291,10 +290,10 @@ func GeneticAlgorithm(slideShow []Photo, repetition int, slideShowLength int) []
 		}
 
 		// Send the max score to the UI
-		broadcast <- Message{
-			Action: actionMaxScore,
-			Data:   maxScore,
-		}
+		// broadcast <- Message{
+		// 	Action: actionMaxScore,
+		// 	Data:   maxScore,
+		// }
 	}
 
 	return slideShow

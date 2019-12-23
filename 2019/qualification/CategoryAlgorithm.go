@@ -12,9 +12,9 @@ func startCategoryAlgorithm(filePath string) {
 
 	// Assign vertical
 	// fmt.Println("Assigning vertical photos ......")
-	photos = AssignVertical(photos)
-	// photos = assignEasyVertical(photos)
-
+	// photos = AssignVertical(photos)
+	photos = assignEasyVertical(photos)
+	//
 	// Photos Length
 	// fmt.Println("Slide show length:", len(photos))
 
@@ -30,7 +30,7 @@ func startCategoryAlgorithm(filePath string) {
 	ite := maxNrOfTags / 2
 	// fmt.Println("Max iteration to make:", ite)
 	for i := 0; i < ite; i++ {
-		photos, ok = CategoryAlgorithm(photos, i)
+		photos, ok = CategoryAlgorithm(photos, i, filePath)
 
 		if !ok {
 			break
@@ -44,9 +44,9 @@ func startCategoryAlgorithm(filePath string) {
 }
 
 // CategoryAlgorithm greedy
-func CategoryAlgorithm(photos []Photo, maxNrOfTags int) ([]Photo, bool) {
+func CategoryAlgorithm(photos []Photo, maxNrOfTags int, filePath string) ([]Photo, bool) {
 	maxScoreNew := CalcScore(photos)
-	// fmt.Println("New score:", maxScoreNew)
+	fmt.Println(filePath, "- New score:", maxScoreNew)
 	if maxScore == maxScoreNew {
 		return photos, false
 	} else {

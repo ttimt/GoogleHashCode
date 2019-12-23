@@ -70,8 +70,8 @@ func assignEasyVertical(photos []Photo) (answer []Photo) {
 
 	for i := 0; i < len(singleVertical); i += 2 {
 		if i+1 < len(singleVertical) {
-			AppendVerticalPhoto(&photos[i], &photos[i+1])
-			answer = append(answer, photos[i])
+			AppendVerticalPhoto(&singleVertical[i], &singleVertical[i+1])
+			answer = append(answer, singleVertical[i])
 		}
 	}
 
