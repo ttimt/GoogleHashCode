@@ -4,31 +4,31 @@ import (
 	"fmt"
 )
 
-func startCategoryAlgorithm() {
+func startCategoryAlgorithm(filePath string) {
 	// Read file
 	fmt.Println("Importing ......")
-	photos, nrOfPhotos := ReadFile()
-	fmt.Println("Number of photos:", nrOfPhotos)
+	photos, _, maxNrOfTags := ReadFile(filePath)
+	// fmt.Println("Number of photos:", nrOfPhotos)
 
 	// Assign vertical
-	fmt.Println("Assigning vertical photos ......")
-	// photos = AssignVertical(photos)
-	photos = assignEasyVertical(photos)
+	// fmt.Println("Assigning vertical photos ......")
+	photos = AssignVertical(photos)
+	// photos = assignEasyVertical(photos)
 
-	// Update photos length
-	slideShowLength = len(photos)
-	fmt.Println("Slide show length:", slideShowLength)
+	// Photos Length
+	// fmt.Println("Slide show length:", len(photos))
 
 	// Update current score
 	updateAllCurrentScore(photos)
+	score := CalcScore(photos)
 
 	// Algorithm
-	fmt.Println("Running category algorithm ......")
-	fmt.Println("Initial score:", CalcScore(photos))
+	fmt.Println(filePath, "- Running category algorithm ......")
+	// fmt.Println("Initial score:", score)
 	var ok bool
 
 	ite := maxNrOfTags / 2
-	fmt.Println("Max iteration to make:", ite)
+	// fmt.Println("Max iteration to make:", ite)
 	for i := 0; i < ite; i++ {
 		photos, ok = CategoryAlgorithm(photos, i)
 
@@ -38,20 +38,15 @@ func startCategoryAlgorithm() {
 	}
 
 	// Final score
-	fmt.Println("Final score:", CalcScore(photos))
-
-	// Notify the UI that algorithm has ended
-	// m := Message{
-	// 	Action: actionEnd,
-	// 	Data:   true,
-	// }
-	// broadcast <- m
+	score = CalcScore(photos)
+	fmt.Println(filePath, "- Final score:", score)
+	wg.Done()
 }
 
 // CategoryAlgorithm greedy
-func CategoryAlgorithm(photos []Photo, i int) ([]Photo, bool) {
+func CategoryAlgorithm(photos []Photo, maxNrOfTags int) ([]Photo, bool) {
 	maxScoreNew := CalcScore(photos)
-	fmt.Println("New score:", maxScoreNew)
+	// fmt.Println("New score:", maxScoreNew)
 	if maxScore == maxScoreNew {
 		return photos, false
 	} else {
@@ -59,14 +54,14 @@ func CategoryAlgorithm(photos []Photo, i int) ([]Photo, bool) {
 	}
 
 	for k := range photos {
-		// fmt.Println("1", " ")
+		// fmt.Println("1", k)
 		currentTotal := 0
 
 		for j := range photos {
-			// fmt.Println("2", j)
+			// fmt.Println("2", k, j)
 			currentTotal = photos[k].currentScore
 
-			if k != j && currentTotal < maxNrOfTags/2 {
+			if k != j {
 				currentTotal += photos[j].currentScore
 
 				// fmt.Println("3", " ")
@@ -85,9 +80,9 @@ func CategoryAlgorithm(photos []Photo, i int) ([]Photo, bool) {
 					newTotal += CalcScoreBetweenTwo(photos[k], photos[j+1])
 				}
 
-				if newTotal > currentTotal {
+				// fmt.Println("New", newTotal, "Current", currentTotal)
+				if newTotal > currentTotal && newTotal != 0 {
 					// fmt.Println("4", " ")
-					// fmt.Println("New", newTotal, "Current", currentTotal)
 					// Swap
 					temp := photos[k]
 					photos[k] = photos[j]

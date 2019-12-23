@@ -1,14 +1,10 @@
 package main
 
-import (
-	"fmt"
-)
-
 // AssignVertical assign vertical photos
 func AssignVertical(photos []Photo) (answer []Photo) {
 	// Store unassigned vertical photos
 	var singleVertical []Photo
-	fmt.Println("Assign vertical: 1")
+	// fmt.Println("Assign vertical: 1")
 	// Filter out all horizontal images
 	for _, p := range photos {
 		if p.orientation != 'V' {
@@ -56,7 +52,7 @@ func AssignVertical(photos []Photo) (answer []Photo) {
 		}
 	}
 
-	fmt.Println("Assign vertical: 6")
+	// fmt.Println("Assign vertical: 6")
 	return
 }
 

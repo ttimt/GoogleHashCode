@@ -2,6 +2,7 @@ package main
 
 import (
 	"math/rand"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -33,11 +34,11 @@ const (
 	actionData     = "data"
 
 	// File paths
-	// filePath = "qualification_round_2019/a_example.txt"
-	// filePath = "qualification_round_2019/b_lovely_landscapes.txt"
-	// filePath = "qualification_round_2019/c_memorable_moments.txt"
-	filePath = "qualification_round_2019/d_pet_pictures.txt"
-	// filePath = "qualification_round_2019/e_shiny_selfies.txt"
+	filePathA = "qualification_round_2019/a_example.txt"
+	filePathB = "qualification_round_2019/b_lovely_landscapes.txt"
+	filePathC = "qualification_round_2019/c_memorable_moments.txt"
+	filePathD = "qualification_round_2019/d_pet_pictures.txt"
+	filePathE = "qualification_round_2019/e_shiny_selfies.txt"
 )
 
 // Photo store imported photo information
@@ -66,13 +67,11 @@ type Message struct {
 var client *websocket.Conn
 var broadcast = make(chan Message)
 var isAlgorithmRunning = false
-
-var maxNrOfTags int
+var wg sync.WaitGroup
 
 // TODO also score the best slide show to match with maxScore
 var maxScore = 0
 var r = rand.New(rand.NewSource(time.Now().Unix()))
-var slideShowLength int
 
 // TODO allow configuration of mutation rate, crossover rate etc
 var mutationRate = 0.2
@@ -83,5 +82,12 @@ func main() {
 	// go WriteMessage()
 	//
 	// select {}
-	startCategoryAlgorithm()
+
+	wg.Add(5)
+	go startCategoryAlgorithm(filePathA)
+	go startCategoryAlgorithm(filePathB)
+	go startCategoryAlgorithm(filePathC)
+	go startCategoryAlgorithm(filePathD)
+	go startCategoryAlgorithm(filePathE)
+	wg.Wait()
 }

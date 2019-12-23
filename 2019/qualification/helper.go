@@ -66,8 +66,8 @@ func HandleConnections(w http.ResponseWriter, r *http.Request) {
 			if m.Action == actionSend && m.Data.(bool) && !isAlgorithmRunning {
 				fmt.Println("Starting algorithm ......")
 				isAlgorithmRunning = true
-				// StartAlgorithm()
-				startCategoryAlgorithm()
+				StartAlgorithm(filePathA)
+				// startCategoryAlgorithm()
 
 				// Switch off the flag
 				isAlgorithmRunning = false
@@ -91,9 +91,9 @@ func WriteMessage() {
 }
 
 // ReadFile read the dataset of the problem
-func ReadFile() (photos []Photo, nrOfPhotos int) {
+func ReadFile(filePath string) (photos []Photo, nrOfPhotos int, maxNrOfTags int) {
 	// Define file location
-	fmt.Println("File used:", filePath)
+	// fmt.Println("File used:", filePath)
 
 	// Initialize ID
 	var id int

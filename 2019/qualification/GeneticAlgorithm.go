@@ -6,23 +6,24 @@ import (
 )
 
 // StartAlgorithm will execute the whole algorithm
-func StartAlgorithm() {
+func StartAlgorithm(filePath string) {
 	// Read file
 	fmt.Println("Importing ......")
-	photos, nrOfPhotos := ReadFile()
+	photos, nrOfPhotos, maxNrOfTags := ReadFile(filePath)
 	fmt.Println("Number of photos:", nrOfPhotos)
+	fmt.Println("Max number of tags:", maxNrOfTags)
 
 	// Assign vertical
 	fmt.Println("Assigning vertical photos ......")
 	photos = AssignVertical(photos)
 
 	// Update photos length
-	slideShowLength = len(photos)
+	slideShowLength := len(photos)
 
 	// Genetic algorithm
 	fmt.Println("Running algorithm ......")
 	// maxScore = CalcScore(photos)
-	photos = GeneticAlgorithm(photos, repetition)
+	photos = GeneticAlgorithm(photos, repetition, slideShowLength)
 
 	// Final score
 	fmt.Println("Final score:")
@@ -37,7 +38,7 @@ func StartAlgorithm() {
 }
 
 // GeneratePopulation generates random population
-func GeneratePopulation(slideShow *[]Photo) *[][]Photo {
+func GeneratePopulation(slideShow *[]Photo, slideShowLength int) *[][]Photo {
 	// Use to store the population and store the original slide show in the set
 	var set [][]Photo
 	set = append(set, *slideShow)
@@ -161,7 +162,7 @@ func SelectFittest(set *[][]Photo) int {
 }
 
 // CreateOffspring create offspring from 2 parents
-func CreateOffspring(set *[][]Photo, fittestSlideShowPosition int) []Photo {
+func CreateOffspring(set *[][]Photo, fittestSlideShowPosition int, slideShowLength int) []Photo {
 	// The random slide show selected could be the fittest slide show as well,
 	// which will cause the new offspring to have
 	// the same gene as the fittest slide show prior to mutation
@@ -224,7 +225,7 @@ func CreateOffspring(set *[][]Photo, fittestSlideShowPosition int) []Photo {
 }
 
 // OffspringMutation mutates the offspring
-func OffspringMutation(offspring *[]Photo) {
+func OffspringMutation(offspring *[]Photo, slideShowLength int) {
 	hasMutation := r.Float64() < mutationRate
 
 	if hasMutation {
@@ -242,7 +243,7 @@ func OffspringMutation(offspring *[]Photo) {
 }
 
 // GeneticAlgorithm is the optimization algorithm
-func GeneticAlgorithm(slideShow []Photo, repetition int) []Photo {
+func GeneticAlgorithm(slideShow []Photo, repetition int, slideShowLength int) []Photo {
 	// 1. Generate population / a set of slide shows
 	// 2. Pick the fittest
 	// 3. Create an offspring from the fittest and a random slide show
@@ -252,7 +253,7 @@ func GeneticAlgorithm(slideShow []Photo, repetition int) []Photo {
 	for i := 0; i < repetition; i++ {
 		// 1. Generate a population / a set of slide shows
 		fmt.Println("1.0 Repetition:", i)
-		set := GeneratePopulation(&slideShow)
+		set := GeneratePopulation(&slideShow, slideShowLength)
 
 		// 2. Calculate and pick the fittest slide show
 		fmt.Println("2.0 Repetition:", i)
@@ -260,11 +261,11 @@ func GeneticAlgorithm(slideShow []Photo, repetition int) []Photo {
 
 		// 3. Create an offspring from the fittest slide show and a random slide show
 		fmt.Println("3.0 Repetition:", i)
-		offspring := CreateOffspring(set, fittestSlideShowPosition)
+		offspring := CreateOffspring(set, fittestSlideShowPosition, slideShowLength)
 
 		// 4. Mutate the offspring
 		fmt.Println("4.0 Repetition:", i)
-		OffspringMutation(&offspring)
+		OffspringMutation(&offspring, slideShowLength)
 
 		// 4.5 Set fittest slide show as offspring if the offspring has lower score
 		// if CalcScore((*set)[fittestSlideShowPosition]) > CalcScore(offspring) {
