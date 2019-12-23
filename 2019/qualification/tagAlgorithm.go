@@ -23,8 +23,8 @@ func startTagAlgorithm(filePath string) {
 
 	// Assign vertical
 	// fmt.Println("Assigning vertical photos ......")
-	photos = AssignVertical(photos)
-	// photos = assignEasyVertical(photos)
+	// photos = AssignVertical(photos)
+	photos = assignEasyVertical(photos)
 
 	// Photos Length
 	// fmt.Println("Slide show length:", len(photos))
@@ -64,6 +64,7 @@ func tagAlgorithm(photos []Photo) []Photo {
 	}
 	// END
 
+	fmt.Println("reach 0")
 	// Get photos that has the tag
 	samePhotosMap := make(map[int][]*Photo)
 
@@ -76,6 +77,7 @@ func tagAlgorithm(photos []Photo) []Photo {
 	}
 	// END
 
+	fmt.Println("reach 1")
 	// Assign to slide show
 	assigned := make(map[int]struct{})
 
@@ -84,7 +86,7 @@ func tagAlgorithm(photos []Photo) []Photo {
 	currentPhoto := &photos[0]
 
 	// Store unassigned
-	var storage []*Photo
+	var storage []Photo
 
 	for i := 0; i < len(photos); i++ {
 		if _, ok := assigned[photos[i].id]; !ok {
@@ -96,11 +98,16 @@ func tagAlgorithm(photos []Photo) []Photo {
 		}
 	}
 
-	// fmt.Println("Storage length:", len(storage))
+	fmt.Println("Score:", CalcScore(answer))
+	fmt.Println("Length:", len(answer))
+	fmt.Println("Storage length:", len(storage))
+
+	greedyInsert(&answer, &storage, samePhotosMap, assigned)
+
 	return answer
 }
 
-func solve(currentPhoto *Photo, assigned *map[int]struct{}, samePhotosMap map[int][]*Photo, answer *[]Photo, storage *[]*Photo) {
+func solve(currentPhoto *Photo, assigned *map[int]struct{}, samePhotosMap map[int][]*Photo, answer *[]Photo, storage *[]Photo) {
 	// Get max score
 	var maxPhoto *Photo
 	var maxScore int
@@ -119,7 +126,13 @@ func solve(currentPhoto *Photo, assigned *map[int]struct{}, samePhotosMap map[in
 	}
 
 	if maxPhoto == nil {
-		*storage = append(*storage, currentPhoto)
+		// fmt.Println("Current ID:", currentPhoto.id, string(currentPhoto.orientation), currentPhoto.nrOfTag)
+		// fmt.Println("Same photo len", len(samePhotosMap[currentPhoto.id]))
+		// printSamePhotos(samePhotosMap[currentPhoto.id])
+		// *storage = append(*storage, *currentPhoto)
+		// *answer = (*answer)[:len(*answer)-1]
+		// delete(*assigned, currentPhoto.id)
+		// panic("done")
 	}
 
 	// Assign to the photo with max score
@@ -131,6 +144,39 @@ func solve(currentPhoto *Photo, assigned *map[int]struct{}, samePhotosMap map[in
 		// Start on the assigned photo
 		currentPhoto = maxPhoto
 		solve(currentPhoto, assigned, samePhotosMap, answer, storage)
+	}
+}
+
+func greedyInsert(answer *[]Photo, storage *[]Photo, samePhotosMap map[int][]*Photo, assigned map[int]struct{}) {
+	for k := range *storage {
+		// Get max score
+		var maxPhoto *Photo
+		var maxScore int
+
+		for j := range samePhotosMap[(*storage)[k].id] {
+			newScore := CalcScoreBetweenTwo((*storage)[k], *samePhotosMap[(*storage)[k].id][j])
+			if newScore > maxScore {
+				maxScore = newScore
+				maxPhoto = samePhotosMap[(*storage)[k].id][j]
+			}
+
+			if newScore >= (*storage)[k].nrOfTag/2 {
+				break
+			}
+		}
+
+		if maxPhoto != nil {
+			if _, ok := assigned[maxPhoto.id]; ok {
+				pos := getPositionPhoto(*answer, maxPhoto.id)
+				secondPart := (*answer)[pos:]
+				*answer = (*answer)[:pos]
+				*answer = append(*answer, (*storage)[k])
+				*answer = append(*answer, secondPart...)
+			} else {
+				*answer = append(*answer, (*storage)[k])
+				*answer = append(*answer, *maxPhoto)
+			}
+		}
 	}
 }
 
@@ -222,4 +268,16 @@ func slideShowNoDuplicate(photos []Photo) bool {
 	}
 
 	return true
+}
+
+func getPositionPhoto(photos []Photo, id int) int {
+	position := 0
+
+	for k := range photos {
+		if photos[k].id == id {
+			position = k
+		}
+	}
+
+	return position
 }

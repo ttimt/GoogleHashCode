@@ -11,7 +11,7 @@ import (
 // Result: 702,864‬
 // 2019 Qualification Position: #873
 // A - 2
-// B - 205,623
+// B - 205,656
 // C - 1,627
 // D - 292,762
 // E - 202,850
@@ -88,8 +88,8 @@ func main() {
 	// go startTagAlgorithm(filePathA)
 	// go startTagAlgorithm(filePathB)
 	// go startTagAlgorithm(filePathC)
-	go StartAlgorithm(filePathD)
-	// go startCategoryAlgorithm(filePathE)
+	// go startCategoryAlgorithm(filePathD)
+	go startTagAlgorithm(filePathE)
 
 	// go startTagAlgorithm(filePathF)
 	wg.Wait()
