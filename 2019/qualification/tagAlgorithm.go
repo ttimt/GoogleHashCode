@@ -22,9 +22,9 @@ func startTagAlgorithm(filePath string) {
 	// fmt.Println("Number of photos:", nrOfPhotos)
 
 	// Assign vertical
-	// fmt.Println("Assigning vertical photos ......")
+	fmt.Println("Assigning vertical photos ......")
 	// photos = AssignVertical(photos)
-	photos = assignEasyVertical(&photos)
+	photos = assignEasyVertical(photos)
 
 	// Photos Length
 	// fmt.Println("Slide show length:", len(photos))
@@ -83,7 +83,7 @@ func tagAlgorithm(photos []Photo) []Photo {
 
 	// Store answer
 	var answer []Photo
-	currentPhoto := &photos[0]
+	var currentPhoto *Photo
 
 	// Store unassigned
 	var storage []Photo
@@ -94,7 +94,7 @@ func tagAlgorithm(photos []Photo) []Photo {
 			answer = append(answer, photos[i])
 			assigned[photos[i].id] = struct{}{}
 
-			solve(currentPhoto, &assigned, &photos, &answer, &storage, tagMap)
+			solve(currentPhoto, &assigned, tagMap, &answer, &storage)
 		}
 	}
 
@@ -103,12 +103,12 @@ func tagAlgorithm(photos []Photo) []Photo {
 	return answer
 }
 
-func solve(currentPhoto *Photo, assigned *map[int]struct{}, photos *[]Photo, answer *[]Photo, storage *[]Photo, tagMap map[string]*tagWrap) {
+func solve(currentPhoto *Photo, assigned *map[int]struct{}, tagMap map[string]*tagWrap, answer *[]Photo, storage *[]Photo) {
 	// Get max score
 	var maxPhoto *Photo
 	var maxScore int
 	var samePhotos []*Photo
-	// fmt.Println("Photo:", currentPhoto.id)
+
 	for j := range currentPhoto.tags {
 		samePhotos = getPhotosInTag(currentPhoto, tagMap[j])
 
@@ -125,11 +125,13 @@ func solve(currentPhoto *Photo, assigned *map[int]struct{}, photos *[]Photo, ans
 				}
 			}
 		}
+
+		if maxScore >= currentPhoto.nrOfTag/2 {
+			break
+		}
 	}
 
 	if maxPhoto == nil {
-		// fmt.Println("Current ID:", currentPhoto.id, string(currentPhoto.orientation), currentPhoto.nrOfTag)
-		// fmt.Println("Same photo len", len(samePhotosMap[currentPhoto.id]))
 		// printSamePhotos(samePhotosMap[currentPhoto.id])
 		// *storage = append(*storage, *currentPhoto)
 		// *answer = (*answer)[:len(*answer)-1]
@@ -145,7 +147,7 @@ func solve(currentPhoto *Photo, assigned *map[int]struct{}, photos *[]Photo, ans
 
 		// Start on the assigned photo
 		currentPhoto = maxPhoto
-		solve(currentPhoto, assigned, photos, answer, storage, tagMap)
+		solve(currentPhoto, assigned, tagMap, answer, storage)
 	}
 }
 

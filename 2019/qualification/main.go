@@ -8,15 +8,15 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// Result: 702,864‬
-// 2019 Qualification Position: #873
+// My result: 1,111,595
+// 2019 Qualification Position: #19
 // A - 2
-// B - 205,656
+// B - 205,689
 // C - 1,627
-// D - 410,128
-// E - 202,850
+// D - 443,825  - 30 minutes + including assigning verticals and creating slide show
+// E - 460,452  - 30 minutes assigning verticals - 2 hrs 50 minutes on creating slide show
 //
-// Best score:
+// Best known score: 1,243,566
 // A - 2
 // B - 239,997
 // C - 1,775
@@ -34,13 +34,12 @@ const (
 	actionData     = "data"
 
 	// File paths
-	prependPath = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\"
-	filePathA   = "qualification_round_2019/a_example.txt"
-	filePathB   = "qualification_round_2019/b_lovely_landscapes.txt"
-	filePathC   = "qualification_round_2019/c_memorable_moments.txt"
-	filePathD   = "qualification_round_2019/d_pet_pictures.txt"
-	filePathE   = "qualification_round_2019/e_shiny_selfies.txt"
-	filePathF   = "qualification_round_2019/f.txt"
+	filePathPrepend = "C:\\Users\\CLM6\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\"
+	filePathA       = "qualification_round_2019/a_example.txt"
+	filePathB       = "qualification_round_2019/b_lovely_landscapes.txt"
+	filePathC       = "qualification_round_2019/c_memorable_moments.txt"
+	filePathD       = "qualification_round_2019/d_pet_pictures.txt"
+	filePathE       = "qualification_round_2019/e_shiny_selfies.txt"
 )
 
 // Photo store imported photo information
@@ -89,9 +88,7 @@ func main() {
 	// go startTagAlgorithm(filePathA)
 	// go startTagAlgorithm(filePathB)
 	// go startTagAlgorithm(filePathC)
-	go startTagAlgorithm(filePathD)
-	// go startTagAlgorithm(filePathE)
-
-	// go startTagAlgorithm(filePathF)
+	// go startTagAlgorithm(filePathD)
+	go startTagAlgorithm(filePathE)
 	wg.Wait()
 }
