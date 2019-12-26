@@ -83,7 +83,7 @@ func tagAlgorithm(photos []Photo) []Photo {
 
 	// Store answer
 	var answer []Photo
-	currentPhoto := &photos[0]
+	var currentPhoto *Photo
 
 	// Store unassigned
 	var storage []Photo
