@@ -22,11 +22,13 @@ import (
 
 // My latest step end should be earlier than the other rides latest start
 const (
-	// filePath = "qualification_round_2018.in/a_example.in"
-	// filePath = "qualification_round_2018.in/b_should_be_easy.in"
-	// filePath = "qualification_round_2018.in/c_no_hurry.in"
-	filePath = "qualification_round_2018.in/d_metropolis.in"
-	// filePath = "qualification_round_2018.in/e_high_bonus.in"
+	filePathPrepend = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2018\\qualification\\qualification_round_2018.in\\"
+	// filePathPrepend = "C:\\Users\\CLM6\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2018\\qualification\\qualification_round_2018.in\\"
+	filePathA = "a_example.in"
+	filePathB = "b_should_be_easy.in"
+	filePathC = "c_no_hurry.in"
+	filePathD = "d_metropolis.in"
+	filePathE = "e_high_bonus.in"
 )
 
 const (
@@ -81,20 +83,16 @@ var endFrequencyBigGap bool
 func init() {
 	p = problem{}
 
-	readFile()
+	readFile(filePathA)
 }
 
 func main() {
-	debugProblem()
-	// debugVehicles()
-	// debugRides()
 	frequencyAnalysis()
 	runAlgorithm()
 	fmt.Println("Ride assigned!")
-	// printResult()
 	calcScore()
 	fmt.Println("Total score:", score)
-	// printUnassignedRides()
+
 	score = 0
 	fmt.Println("\nProcessing unassigned rides")
 	processUnassignedRides()
@@ -187,12 +185,12 @@ func printUnassignedRides() {
 	}
 }
 
-func readFile() {
+func readFile(filePath string) {
 	// Define file location
 	fmt.Println("File used:", filePath)
 
 	// Open file for reading
-	file, err := os.Open(filePath)
+	file, err := os.Open(filePathPrepend + filePath)
 
 	if err != nil {
 		panic("Cant open file for reading" + err.Error())
