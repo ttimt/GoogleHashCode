@@ -24,7 +24,7 @@ func startTagAlgorithm(filePath string) {
 	// Assign vertical
 	// fmt.Println("Assigning vertical photos ......")
 	// photos = AssignVertical(photos)
-	photos = assignEasyVertical(photos)
+	photos = assignEasyVertical(&photos)
 
 	// Photos Length
 	// fmt.Println("Slide show length:", len(photos))
@@ -66,15 +66,15 @@ func tagAlgorithm(photos []Photo) []Photo {
 
 	fmt.Println("reach 0")
 	// Get photos that has the tag
-	samePhotosMap := make(map[int][]*Photo)
-
-	for k := range photos {
-		var samePhotos []*Photo
-		for j := range photos[k].tags {
-			samePhotos = append(samePhotos, getPhotosInTag(&photos[k], tagMap[j])...)
-		}
-		samePhotosMap[photos[k].id] = samePhotos
-	}
+	// samePhotosMap := make(map[int][]*Photo)
+	//
+	// for k := range photos {
+	// 	var samePhotos []*Photo
+	// 	for j := range photos[k].tags {
+	// 		samePhotos = append(samePhotos, getPhotosInTag(&photos[k], tagMap[j])...)
+	// 	}
+	// 	samePhotosMap[photos[k].id] = samePhotos
+	// }
 	// END
 
 	fmt.Println("reach 1")
@@ -94,33 +94,35 @@ func tagAlgorithm(photos []Photo) []Photo {
 			answer = append(answer, photos[i])
 			assigned[photos[i].id] = struct{}{}
 
-			solve(currentPhoto, &assigned, samePhotosMap, &answer, &storage)
+			solve(currentPhoto, &assigned, &photos, &answer, &storage, tagMap)
 		}
 	}
 
-	fmt.Println("Score:", CalcScore(answer))
-	fmt.Println("Length:", len(answer))
 	fmt.Println("Storage length:", len(storage))
-
-	greedyInsert(&answer, &storage, samePhotosMap, assigned)
 
 	return answer
 }
 
-func solve(currentPhoto *Photo, assigned *map[int]struct{}, samePhotosMap map[int][]*Photo, answer *[]Photo, storage *[]Photo) {
+func solve(currentPhoto *Photo, assigned *map[int]struct{}, photos *[]Photo, answer *[]Photo, storage *[]Photo, tagMap map[string]*tagWrap) {
 	// Get max score
 	var maxPhoto *Photo
 	var maxScore int
-	for j := range samePhotosMap[currentPhoto.id] {
-		if _, ok := (*assigned)[samePhotosMap[currentPhoto.id][j].id]; !ok {
-			newScore := CalcScoreBetweenTwo(*currentPhoto, *samePhotosMap[currentPhoto.id][j])
-			if newScore > maxScore {
-				maxScore = newScore
-				maxPhoto = samePhotosMap[currentPhoto.id][j]
-			}
+	var samePhotos []*Photo
+	// fmt.Println("Photo:", currentPhoto.id)
+	for j := range currentPhoto.tags {
+		samePhotos = getPhotosInTag(currentPhoto, tagMap[j])
 
-			if newScore >= currentPhoto.nrOfTag/2 {
-				break
+		for h := range samePhotos {
+			if _, ok := (*assigned)[samePhotos[h].id]; !ok {
+				newScore := CalcScoreBetweenTwo(*currentPhoto, *samePhotos[h])
+				if newScore > maxScore {
+					maxScore = newScore
+					maxPhoto = samePhotos[h]
+				}
+
+				if maxScore >= currentPhoto.nrOfTag/2 {
+					break
+				}
 			}
 		}
 	}
@@ -143,40 +145,7 @@ func solve(currentPhoto *Photo, assigned *map[int]struct{}, samePhotosMap map[in
 
 		// Start on the assigned photo
 		currentPhoto = maxPhoto
-		solve(currentPhoto, assigned, samePhotosMap, answer, storage)
-	}
-}
-
-func greedyInsert(answer *[]Photo, storage *[]Photo, samePhotosMap map[int][]*Photo, assigned map[int]struct{}) {
-	for k := range *storage {
-		// Get max score
-		var maxPhoto *Photo
-		var maxScore int
-
-		for j := range samePhotosMap[(*storage)[k].id] {
-			newScore := CalcScoreBetweenTwo((*storage)[k], *samePhotosMap[(*storage)[k].id][j])
-			if newScore > maxScore {
-				maxScore = newScore
-				maxPhoto = samePhotosMap[(*storage)[k].id][j]
-			}
-
-			if newScore >= (*storage)[k].nrOfTag/2 {
-				break
-			}
-		}
-
-		if maxPhoto != nil {
-			if _, ok := assigned[maxPhoto.id]; ok {
-				pos := getPositionPhoto(*answer, maxPhoto.id)
-				secondPart := (*answer)[pos:]
-				*answer = (*answer)[:pos]
-				*answer = append(*answer, (*storage)[k])
-				*answer = append(*answer, secondPart...)
-			} else {
-				*answer = append(*answer, (*storage)[k])
-				*answer = append(*answer, *maxPhoto)
-			}
-		}
+		solve(currentPhoto, assigned, photos, answer, storage, tagMap)
 	}
 }
 

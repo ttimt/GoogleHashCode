@@ -13,7 +13,7 @@ import (
 // A - 2
 // B - 205,656
 // C - 1,627
-// D - 292,762
+// D - 410,128
 // E - 202,850
 //
 // Best score:
@@ -34,12 +34,13 @@ const (
 	actionData     = "data"
 
 	// File paths
-	filePathA = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019/a_example.txt"
-	filePathB = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019/b_lovely_landscapes.txt"
-	filePathC = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019/c_memorable_moments.txt"
-	filePathD = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019/d_pet_pictures.txt"
-	filePathE = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019/e_shiny_selfies.txt"
-	filePathF = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019/f.txt"
+	prependPath = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\"
+	filePathA   = "qualification_round_2019/a_example.txt"
+	filePathB   = "qualification_round_2019/b_lovely_landscapes.txt"
+	filePathC   = "qualification_round_2019/c_memorable_moments.txt"
+	filePathD   = "qualification_round_2019/d_pet_pictures.txt"
+	filePathE   = "qualification_round_2019/e_shiny_selfies.txt"
+	filePathF   = "qualification_round_2019/f.txt"
 )
 
 // Photo store imported photo information
@@ -88,8 +89,8 @@ func main() {
 	// go startTagAlgorithm(filePathA)
 	// go startTagAlgorithm(filePathB)
 	// go startTagAlgorithm(filePathC)
-	// go startCategoryAlgorithm(filePathD)
-	go startTagAlgorithm(filePathE)
+	go startTagAlgorithm(filePathD)
+	// go startTagAlgorithm(filePathE)
 
 	// go startTagAlgorithm(filePathF)
 	wg.Wait()

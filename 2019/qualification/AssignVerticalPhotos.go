@@ -56,11 +56,11 @@ func AssignVertical(photos []Photo) (answer []Photo) {
 	return
 }
 
-func assignEasyVertical(photos []Photo) (answer []Photo) {
+func assignEasyVertical(photos *[]Photo) (answer []Photo) {
 	// Store unassigned vertical photos
 	var singleVertical []Photo
 
-	for _, p := range photos {
+	for _, p := range *photos {
 		if p.orientation != 'V' {
 			answer = append(answer, p)
 		} else {
