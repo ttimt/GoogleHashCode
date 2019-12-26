@@ -8,13 +8,13 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// Result: 1047,168
-// 2019 Qualification Position: #68
+// Result: 1,111,595
+// 2019 Qualification Position: #19
 // A - 2
 // B - 205,689
 // C - 1,627
-// D - 443,825
-// E - 396,025
+// D - 443,825  - 30 minutes + including assigning verticals and creating slide show
+// E - 460,452  - 30 minutes assigning verticals - 2 hrs 50 minutes on creating slide show
 //
 // Best score: 1,243,566
 // A - 2

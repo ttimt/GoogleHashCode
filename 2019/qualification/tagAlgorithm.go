@@ -23,8 +23,8 @@ func startTagAlgorithm(filePath string) {
 
 	// Assign vertical
 	fmt.Println("Assigning vertical photos ......")
-	photos = AssignVertical(photos)
-	// photos = assignEasyVertical(photos)
+	// photos = AssignVertical(photos)
+	photos = assignEasyVertical(photos)
 
 	// Photos Length
 	// fmt.Println("Slide show length:", len(photos))
