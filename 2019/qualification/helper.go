@@ -99,7 +99,7 @@ func ReadFile(filePath string) (photos []Photo, nrOfPhotos int, maxNrOfTags int)
 	var id int
 
 	// Open file for reading
-	file, err := os.Open(filePath)
+	file, err := os.Open(filePathPrepend + filePath)
 
 	if err != nil {
 		panic("Cant open file for reading" + err.Error())

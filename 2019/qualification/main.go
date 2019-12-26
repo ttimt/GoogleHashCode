@@ -8,15 +8,15 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// Result: 702,864‬
-// 2019 Qualification Position: #873
+// Result: 1013,523
+// 2019 Qualification Position: #151
 // A - 2
-// B - 205,656
+// B - 205,689
 // C - 1,627
-// D - 292,762
-// E - 202,850
+// D - 410,180
+// E - 396,025
 //
-// Best score:
+// Best score: 1,243,566
 // A - 2
 // B - 239,997
 // C - 1,775
@@ -34,12 +34,12 @@ const (
 	actionData     = "data"
 
 	// File paths
-	filePathA = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019/a_example.txt"
-	filePathB = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019/b_lovely_landscapes.txt"
-	filePathC = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019/c_memorable_moments.txt"
-	filePathD = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019/d_pet_pictures.txt"
-	filePathE = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019/e_shiny_selfies.txt"
-	filePathF = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019/f.txt"
+	filePathPrepend = "C:\\Users\\CLM6\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\"
+	filePathA       = "qualification_round_2019/a_example.txt"
+	filePathB       = "qualification_round_2019/b_lovely_landscapes.txt"
+	filePathC       = "qualification_round_2019/c_memorable_moments.txt"
+	filePathD       = "qualification_round_2019/d_pet_pictures.txt"
+	filePathE       = "qualification_round_2019/e_shiny_selfies.txt"
 )
 
 // Photo store imported photo information
@@ -88,9 +88,7 @@ func main() {
 	// go startTagAlgorithm(filePathA)
 	// go startTagAlgorithm(filePathB)
 	// go startTagAlgorithm(filePathC)
-	// go startCategoryAlgorithm(filePathD)
-	go startTagAlgorithm(filePathE)
-
-	// go startTagAlgorithm(filePathF)
+	go startTagAlgorithm(filePathD)
+	// go startTagAlgorithm(filePathE)
 	wg.Wait()
 }
