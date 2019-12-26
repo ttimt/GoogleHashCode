@@ -10,9 +10,9 @@ import (
 
 // My result: 1,111,595
 // 2019 Qualification Position: #19
-// A - 2
-// B - 205,689
-// C - 1,627
+// A - 2        - all under 1 minute
+// B - 205,689  - all under 1 minute
+// C - 1,627    - all under 1 minute
 // D - 443,825  - 2 minutes assigning verticals (Score: 229,448) - 14 minutes creating slide show
 // E - 460,452  - 19 minutes assigning verticals (Score: 178,982) - 2 hrs 50 minutes on creating slide show
 //
@@ -83,11 +83,11 @@ func main() {
 	// select {}
 
 	wg.Add(2)
-	// go startTagAlgorithm(filePathA)
-	// go startTagAlgorithm(filePathB)
-	// go startTagAlgorithm(filePathC)
 	fmt.Println(time.Now().Format(time.Kitchen))
-	go startTagAlgorithm(filePathD)
-	go startTagAlgorithm(filePathE)
+	go startTagAlgorithm(filePathA)
+	// go startTagAlgorithm(filePathB)
+	go startTagAlgorithm(filePathC)
+	// go startTagAlgorithm(filePathD)
+	// go startTagAlgorithm(filePathE)
 	wg.Wait()
 }
