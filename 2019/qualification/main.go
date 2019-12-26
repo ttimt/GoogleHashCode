@@ -33,13 +33,13 @@ const (
 	actionData     = "data"
 
 	// File paths
-	filePathPrepend = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\"
-	// filePathPrepend = "C:\\Users\\CLM6\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\"
-	filePathA = "qualification_round_2019/a_example.txt"
-	filePathB = "qualification_round_2019/b_lovely_landscapes.txt"
-	filePathC = "qualification_round_2019/c_memorable_moments.txt"
-	filePathD = "qualification_round_2019/d_pet_pictures.txt"
-	filePathE = "qualification_round_2019/e_shiny_selfies.txt"
+	filePathPrepend = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019\\"
+	// filePathPrepend = "C:\\Users\\CLM6\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\qualification_round_2019\\"
+	filePathA = "a_example.txt"
+	filePathB = "b_lovely_landscapes.txt"
+	filePathC = "c_memorable_moments.txt"
+	filePathD = "d_pet_pictures.txt"
+	filePathE = "e_shiny_selfies.txt"
 )
 
 // Photo store imported photo information
@@ -81,11 +81,11 @@ func main() {
 	//
 	// select {}
 
-	wg.Add(1)
+	wg.Add(2)
 	// go startTagAlgorithm(filePathA)
 	// go startTagAlgorithm(filePathB)
 	// go startTagAlgorithm(filePathC)
-	// go startTagAlgorithm(filePathD)
+	go startTagAlgorithm(filePathD)
 	go startTagAlgorithm(filePathE)
 	wg.Wait()
 }

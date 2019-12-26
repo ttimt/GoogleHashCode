@@ -17,12 +17,12 @@ type tagWrap struct {
 
 func startTagAlgorithm(filePath string) {
 	// Read file
-	fmt.Println("Importing ......")
+	fmt.Println(filePath, "- Importing ......")
 	photos, _, _ := ReadFile(filePath)
 	// fmt.Println("Number of photos:", nrOfPhotos)
 
 	// Assign vertical
-	fmt.Println("Assigning vertical photos ......")
+	fmt.Println(filePath, "- Assigning vertical photos ......")
 	photos = AssignVertical(photos)
 	// photos = assignEasyVertical(&photos)
 
