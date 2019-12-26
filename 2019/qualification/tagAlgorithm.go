@@ -22,7 +22,7 @@ func startTagAlgorithm(filePath string) {
 	// fmt.Println("Number of photos:", nrOfPhotos)
 
 	// Assign vertical
-	// fmt.Println("Assigning vertical photos ......")
+	fmt.Println("Assigning vertical photos ......")
 	photos = AssignVertical(photos)
 	// photos = assignEasyVertical(photos)
 

@@ -8,12 +8,12 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// Result: 1013,523
-// 2019 Qualification Position: #151
+// Result: 1047,168
+// 2019 Qualification Position: #68
 // A - 2
 // B - 205,689
 // C - 1,627
-// D - 410,180
+// D - 443,825
 // E - 396,025
 //
 // Best score: 1,243,566
@@ -88,7 +88,7 @@ func main() {
 	// go startTagAlgorithm(filePathA)
 	// go startTagAlgorithm(filePathB)
 	// go startTagAlgorithm(filePathC)
-	go startTagAlgorithm(filePathD)
-	// go startTagAlgorithm(filePathE)
+	// go startTagAlgorithm(filePathD)
+	go startTagAlgorithm(filePathE)
 	wg.Wait()
 }
