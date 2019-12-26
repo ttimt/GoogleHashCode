@@ -1,11 +1,10 @@
 package main
 
 import (
+	"github.com/gorilla/websocket"
 	"math/rand"
 	"sync"
 	"time"
-
-	"github.com/gorilla/websocket"
 )
 
 // My result: 1,111,595
@@ -34,12 +33,13 @@ const (
 	actionData     = "data"
 
 	// File paths
-	filePathPrepend = "C:\\Users\\CLM6\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\"
-	filePathA       = "qualification_round_2019/a_example.txt"
-	filePathB       = "qualification_round_2019/b_lovely_landscapes.txt"
-	filePathC       = "qualification_round_2019/c_memorable_moments.txt"
-	filePathD       = "qualification_round_2019/d_pet_pictures.txt"
-	filePathE       = "qualification_round_2019/e_shiny_selfies.txt"
+	filePathPrepend = "C:\\Users\\Timothy\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\"
+	// filePathPrepend = "C:\\Users\\CLM6\\go\\src\\github.com\\ttimt\\GoogleHashCode\\2019\\qualification\\"
+	filePathA = "qualification_round_2019/a_example.txt"
+	filePathB = "qualification_round_2019/b_lovely_landscapes.txt"
+	filePathC = "qualification_round_2019/c_memorable_moments.txt"
+	filePathD = "qualification_round_2019/d_pet_pictures.txt"
+	filePathE = "qualification_round_2019/e_shiny_selfies.txt"
 )
 
 // Photo store imported photo information
@@ -70,11 +70,8 @@ var broadcast = make(chan Message)
 var isAlgorithmRunning = false
 var wg sync.WaitGroup
 
-// TODO also score the best slide show to match with maxScore
 var maxScore = 0
 var r = rand.New(rand.NewSource(time.Now().Unix()))
-
-// TODO allow configuration of mutation rate, crossover rate etc
 var mutationRate = 0.2
 
 func main() {

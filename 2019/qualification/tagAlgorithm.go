@@ -23,26 +23,18 @@ func startTagAlgorithm(filePath string) {
 
 	// Assign vertical
 	fmt.Println("Assigning vertical photos ......")
-	// photos = AssignVertical(photos)
-	photos = assignEasyVertical(photos)
-
-	// Photos Length
-	// fmt.Println("Slide show length:", len(photos))
-
-	// Update current score
-	updateAllCurrentScore(photos)
-	score := CalcScore(photos)
+	photos = AssignVertical(photos)
+	// photos = assignEasyVertical(&photos)
 
 	// Algorithm
 	fmt.Println(filePath, "- Running tag algorithm ......")
-	fmt.Println(filePath, "- Initial score:", score)
+	fmt.Println(filePath, "- Initial score:", CalcScore(photos))
 	fmt.Println(filePath, "- Initial Length:", len(photos))
 
 	photos = tagAlgorithm(photos)
 
 	// Final score
-	score = CalcScore(photos)
-	fmt.Println(filePath, "-- Final score:", score)
+	fmt.Println(filePath, "-- Final score:", CalcScore(photos))
 	fmt.Println(filePath, "-- Final Length:", len(photos))
 
 	wg.Done()
@@ -64,20 +56,6 @@ func tagAlgorithm(photos []Photo) []Photo {
 	}
 	// END
 
-	fmt.Println("reach 0")
-	// Get photos that has the tag
-	// samePhotosMap := make(map[int][]*Photo)
-	//
-	// for k := range photos {
-	// 	var samePhotos []*Photo
-	// 	for j := range photos[k].tags {
-	// 		samePhotos = append(samePhotos, getPhotosInTag(&photos[k], tagMap[j])...)
-	// 	}
-	// 	samePhotosMap[photos[k].id] = samePhotos
-	// }
-	// END
-
-	fmt.Println("reach 1")
 	// Assign to slide show
 	assigned := make(map[int]struct{})
 
@@ -85,69 +63,56 @@ func tagAlgorithm(photos []Photo) []Photo {
 	var answer []Photo
 	var currentPhoto *Photo
 
-	// Store unassigned
-	var storage []Photo
-
 	for i := 0; i < len(photos); i++ {
 		if _, ok := assigned[photos[i].id]; !ok {
 			currentPhoto = &photos[i]
 			answer = append(answer, photos[i])
 			assigned[photos[i].id] = struct{}{}
 
-			solve(currentPhoto, &assigned, tagMap, &answer, &storage)
+			solve(currentPhoto, assigned, tagMap, &answer)
 		}
 	}
-
-	fmt.Println("Storage length:", len(storage))
 
 	return answer
 }
 
-func solve(currentPhoto *Photo, assigned *map[int]struct{}, tagMap map[string]*tagWrap, answer *[]Photo, storage *[]Photo) {
+func solve(currentPhoto *Photo, assigned map[int]struct{}, tagMap map[string]*tagWrap, answer *[]Photo) {
 	// Get max score
 	var maxPhoto *Photo
 	var maxScore int
 	var samePhotos []*Photo
+	currentPhotoMaxScore := currentPhoto.nrOfTag / 2
 
 	for j := range currentPhoto.tags {
 		samePhotos = getPhotosInTag(currentPhoto, tagMap[j])
 
 		for h := range samePhotos {
-			if _, ok := (*assigned)[samePhotos[h].id]; !ok {
+			if _, ok := assigned[samePhotos[h].id]; !ok {
 				newScore := CalcScoreBetweenTwo(*currentPhoto, *samePhotos[h])
 				if newScore > maxScore {
 					maxScore = newScore
 					maxPhoto = samePhotos[h]
 				}
 
-				if maxScore >= currentPhoto.nrOfTag/2 {
+				if maxScore >= currentPhotoMaxScore {
 					break
 				}
 			}
 		}
 
-		if maxScore >= currentPhoto.nrOfTag/2 {
+		if maxScore >= currentPhotoMaxScore {
 			break
 		}
 	}
 
-	if maxPhoto == nil {
-		// printSamePhotos(samePhotosMap[currentPhoto.id])
-		// *storage = append(*storage, *currentPhoto)
-		// *answer = (*answer)[:len(*answer)-1]
-		// delete(*assigned, currentPhoto.id)
-		// panic("done")
-	}
-
 	// Assign to the photo with max score
 	if maxPhoto != nil {
-		(*assigned)[maxPhoto.id] = struct{}{}
+		assigned[maxPhoto.id] = struct{}{}
 		*answer = append(*answer, *maxPhoto)
-		// printSlideShow(answer)
 
 		// Start on the assigned photo
 		currentPhoto = maxPhoto
-		solve(currentPhoto, assigned, tagMap, answer, storage)
+		solve(currentPhoto, assigned, tagMap, answer)
 	}
 }
 
