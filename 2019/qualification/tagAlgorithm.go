@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
 type tag struct {
@@ -25,6 +26,7 @@ func startTagAlgorithm(filePath string) {
 	fmt.Println(filePath, "- Assigning vertical photos ......")
 	photos = AssignVertical(photos)
 	// photos = assignEasyVertical(&photos)
+	fmt.Println(filePath, "Assign vertical done", time.Now().Format(time.Kitchen))
 
 	// Algorithm
 	fmt.Println(filePath, "- Running tag algorithm ......")
@@ -37,6 +39,7 @@ func startTagAlgorithm(filePath string) {
 	fmt.Println(filePath, "-- Final score:", CalcScore(photos))
 	fmt.Println(filePath, "-- Final Length:", len(photos))
 
+	fmt.Println(filePath, "Algorithm done", time.Now().Format(time.Kitchen))
 	wg.Done()
 }
 

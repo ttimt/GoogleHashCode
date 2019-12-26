@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gorilla/websocket"
 	"math/rand"
 	"sync"
@@ -12,8 +13,8 @@ import (
 // A - 2
 // B - 205,689
 // C - 1,627
-// D - 443,825  - 30 minutes + including assigning verticals and creating slide show
-// E - 460,452  - 30 minutes assigning verticals - 2 hrs 50 minutes on creating slide show
+// D - 443,825  - 2 minutes assigning verticals (Score: 229,448) - 14 minutes creating slide show
+// E - 460,452  - 19 minutes assigning verticals (Score: 178,982) - 2 hrs 50 minutes on creating slide show
 //
 // Best known score: 1,243,566
 // A - 2
@@ -85,6 +86,7 @@ func main() {
 	// go startTagAlgorithm(filePathA)
 	// go startTagAlgorithm(filePathB)
 	// go startTagAlgorithm(filePathC)
+	fmt.Println(time.Now().Format(time.Kitchen))
 	go startTagAlgorithm(filePathD)
 	go startTagAlgorithm(filePathE)
 	wg.Wait()
