@@ -8,13 +8,13 @@ import (
 	"time"
 )
 
-// My result: 1,111,595
+// My result: 1,111,755
 // 2019 Qualification Position: #19
 // A - 2        - all under 1 minute
 // B - 205,689  - all under 1 minute
 // C - 1,627    - all under 1 minute
 // D - 443,825  - 2 minutes assigning verticals (Score: 229,448) - 14 minutes creating slide show
-// E - 460,452  - 19 minutes assigning verticals (Score: 178,982) - 2 hrs 50 minutes on creating slide show
+// E - 460,452  - 19 minutes assigning verticals (Score: 178,982) - 2 hrs 55 minutes on creating slide show
 //
 // Best known score: 1,243,566
 // A - 2
