@@ -25,7 +25,7 @@
 ---
 <br>
 
-**What's this**:
+**What's this**
 - Google Hashcode competition - Past years attempt
 - These solutions were not submitted to the competition
 - Check out the results below
@@ -48,7 +48,7 @@
  This result is ranked at position #19 (From the final scoreboard):
  https://codingcompetitions.withgoogle.com/hashcode/archive/2019
 
-**2018 Qualification attempt***
+**2018 Qualification attempt**
  - Total score: **47,677,361**
  - Dataset A -  **10**
  - Dataset B -  **176,877**
