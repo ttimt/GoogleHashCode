@@ -84,6 +84,7 @@ func solve(currentPhoto *Photo, assigned map[int]struct{}, tagMap map[string]*ta
 	var maxPhoto *Photo
 	var maxScore int
 	var samePhotos []*Photo
+	searchedPhotos := make(map[int]struct{})
 	currentPhotoMaxScore := currentPhoto.nrOfTag / 2
 
 	for j := range currentPhoto.tags {
@@ -91,14 +92,18 @@ func solve(currentPhoto *Photo, assigned map[int]struct{}, tagMap map[string]*ta
 
 		for h := range samePhotos {
 			if _, ok := assigned[samePhotos[h].id]; !ok {
-				newScore := CalcScoreBetweenTwo(*currentPhoto, *samePhotos[h])
-				if newScore > maxScore {
-					maxScore = newScore
-					maxPhoto = samePhotos[h]
-				}
+				if _, ok := searchedPhotos[samePhotos[h].id]; !ok {
+					newScore := CalcScoreBetweenTwo(*currentPhoto, *samePhotos[h])
+					if newScore > maxScore {
+						maxScore = newScore
+						maxPhoto = samePhotos[h]
+					}
 
-				if maxScore >= currentPhotoMaxScore {
-					break
+					if maxScore >= currentPhotoMaxScore {
+						break
+					}
+
+					searchedPhotos[samePhotos[h].id] = struct{}{}
 				}
 			}
 		}

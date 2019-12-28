@@ -2,19 +2,20 @@ package main
 
 import (
 	"fmt"
-	"github.com/gorilla/websocket"
 	"math/rand"
 	"sync"
 	"time"
+
+	"github.com/gorilla/websocket"
 )
 
-// My result: 1,111,755
+// My result: 1,111,810
 // 2019 Qualification Position: #19
 // A - 2        - all under 1 minute
 // B - 205,689  - all under 1 minute
 // C - 1,627    - all under 1 minute
-// D - 443,825  - 2 minutes assigning verticals (Score: 229,448) - 14 minutes creating slide show
-// E - 460,452  - 19 minutes assigning verticals (Score: 178,982) - 2 hrs 55 minutes on creating slide show
+// D - 443,825  - 2 minutes assigning verticals (Score: 229,448) - 12 minutes creating slide show
+// E - 460,507  - 19 minutes assigning verticals (Score: 178,982) - 1 hrs 16 minutes on creating slide show
 //
 // Best known score: 1,243,566
 // A - 2
@@ -84,10 +85,10 @@ func main() {
 
 	wg.Add(2)
 	fmt.Println(time.Now().Format(time.Kitchen))
-	go startTagAlgorithm(filePathA)
+	// go startTagAlgorithm(filePathA)
 	// go startTagAlgorithm(filePathB)
-	go startTagAlgorithm(filePathC)
-	// go startTagAlgorithm(filePathD)
-	// go startTagAlgorithm(filePathE)
+	// go startTagAlgorithm(filePathC)
+	go startTagAlgorithm(filePathD)
+	go startTagAlgorithm(filePathE)
 	wg.Wait()
 }
