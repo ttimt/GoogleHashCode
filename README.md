@@ -27,9 +27,34 @@
 
 **What's this**:
 - Google Hashcode competition - Past years attempt
+- These solutions were not submitted to the competition
+- Check out the results below
 
 **Install package dependency**
 - Install **Yarn** from `https://yarnpkg.com/en/docs/install`
 - Open **CMD** or **shell** at project root folder and run the command
 
     `yarn --ignore-scripts`
+    
+    
+**2019 Qualification attempt**
+ - Total score: **1,111,810**
+ - Dataset A -  **2**
+ - Dataset B -  **205,689**
+ - Dataset C -  **1,627**
+ - Dataset D -  **443,825**
+ - Dataset E -  **560,550**
+ 
+ This result is ranked at position #19 (From the final scoreboard):
+ https://codingcompetitions.withgoogle.com/hashcode/archive/2019
+
+**2018 Qualification attempt***
+ - Total score: **47,677,361**
+ - Dataset A -  **10**
+ - Dataset B -  **176,877**
+ - Dataset C -  **15,770,067**
+ - Dataset D -  **10,264,462**
+ - Dataset E -  **21,465,945**
+ 
+  This result is ranked at position #412 (From the final scoreboard):
+  https://codingcompetitions.withgoogle.com/hashcode/archive/2018
