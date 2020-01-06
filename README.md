@@ -30,7 +30,7 @@
 - These solutions were not submitted to the competition
 - Check out the results below
 
-**Install package dependency**
+**Install package dependency (Only for 2019 qualification)**
 - Install **Yarn** from `https://yarnpkg.com/en/docs/install`
 - Open **CMD** or **shell** at project root folder and run the command
 
