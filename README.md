@@ -9,11 +9,12 @@
 [![Made with GO](https://forthebadge.com/images/badges/made-with-go.svg)](https://golang.org/)
 [![Uses Badges](https://forthebadge.com/images/badges/uses-badges.svg)](https://github.com/ttimt/urlshort-gophercises)
 
+[![Build status](https://img.shields.io/appveyor/ci/ttimt/GoogleHashCode/master?style=for-the-badge&logo=appveyor)](https://ci.appveyor.com/project/ttimt/GoogleHashCode/branch/master)
+![GitHub top language](https://img.shields.io/github/languages/top/ttimt/GoogleHashCode?style=for-the-badge&logo=go)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 ![GitHub last commit](https://img.shields.io/github/last-commit/ttimt/GoogleHashCode?style=for-the-badge)
 
 [![Ask Me Anything !](https://img.shields.io/badge/Ask%20me-anything-1abc9c.svg)](https://linkedin.com/in/timothy0707/)
-[![Build status](https://ci.appveyor.com/api/projects/status/h1if2wmrk8hypbfi/branch/master?svg=true)](https://ci.appveyor.com/project/ttimt/GoogleHashCode/branch/master)
-![GitHub top language](https://img.shields.io/github/languages/top/ttimt/GoogleHashCode)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ttimt/GoogleHashCode)](https://goreportcard.com/report/github.com/ttimt/GoogleHashCode)
 ![GitHub repo size](https://img.shields.io/github/repo-size/ttimt/GoogleHashCode)
 ![GitHub issues](https://img.shields.io/github/issues/ttimt/GoogleHashCode)
