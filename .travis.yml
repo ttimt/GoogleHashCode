@@ -8,4 +8,5 @@ before_install:
   - go get -t -v ./...
 
 script:
-  - go test -race -v
+  - go test -v -race -coverprofile=coverage.txt -covermode=atomic
+  - godacov -t $CODACY_TOKEN -r ./coverage.txt -c $TRAVIS_COMMIT
