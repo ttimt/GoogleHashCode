@@ -10,7 +10,7 @@
 [![Uses Badges](https://forthebadge.com/images/badges/uses-badges.svg)](https://github.com/ttimt/urlshort-gophercises)
 ---
 [![Build status](https://img.shields.io/appveyor/ci/ttimt/GoogleHashCode/master?style=for-the-badge&logo=appveyor)](https://ci.appveyor.com/project/ttimt/GoogleHashCode/branch/master)
-[![CircleCI](https://img.shields.io/circleci/build/github/ttimt/GoogleHashCode?style=for-the-badge&logo=circleci)](https://app.circleci.com/github/ttimt/GoogleHashCode/pipelines)
+[![CircleCI](https://img.shields.io/circleci/build/github/ttimt/GoogleHashCode?style=for-the-badge&logo=circleci)](https://circleci.com/gh/ttimt/GoogleHHashCode)
 [![Travis (.com)](https://img.shields.io/travis/com/ttimt/GoogleHashCode?style=for-the-badge&logo=travis)](https://travis-ci.com/ttimt/GoogleHashCode)
 ---
 [![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/ttimt/GoogleHashCode?style=for-the-badge&logo=code-climate)](https://codeclimate.com/github/ttimt/GoogleHashCode)
