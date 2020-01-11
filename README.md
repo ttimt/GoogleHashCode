@@ -14,6 +14,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 ![GitHub last commit](https://img.shields.io/github/last-commit/ttimt/GoogleHashCode?style=for-the-badge)
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/f064ea09d456fc6d8194/maintainability)](https://codeclimate.com/github/ttimt/GoogleHashCode/maintainability)
+[![CodeFactor](https://www.codefactor.io/repository/github/ttimt/googlehashcode/badge)](https://www.codefactor.io/repository/github/ttimt/googlehashcode)
 [![Ask Me Anything !](https://img.shields.io/badge/Ask%20me-anything-1abc9c.svg)](https://linkedin.com/in/timothy0707/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ttimt/GoogleHashCode)](https://goreportcard.com/report/github.com/ttimt/GoogleHashCode)
 ![GitHub repo size](https://img.shields.io/github/repo-size/ttimt/GoogleHashCode)

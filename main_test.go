@@ -5,7 +5,7 @@ import (
 )
 
 func TestReturnHello(t *testing.T) {
-	want := "hello"
+	want := "Hello"
 	get := returnHello()
 
 	if want != get {
