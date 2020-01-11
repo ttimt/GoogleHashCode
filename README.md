@@ -10,17 +10,17 @@
 [![Uses Badges](https://forthebadge.com/images/badges/uses-badges.svg)](https://github.com/ttimt/urlshort-gophercises)
 ---
 [![Build status](https://img.shields.io/appveyor/ci/ttimt/GoogleHashCode/master?style=for-the-badge&logo=appveyor)](https://ci.appveyor.com/project/ttimt/GoogleHashCode/branch/master)
-![CircleCI](https://img.shields.io/circleci/build/github/ttimt/GoogleHashCode?style=for-the-badge&logo=circleci)
-![Travis (.com)](https://img.shields.io/travis/com/ttimt/GoogleHashCode?style=for-the-badge&logo=travis)
+[![CircleCI](https://img.shields.io/circleci/build/github/ttimt/GoogleHashCode?style=for-the-badge&logo=circleci)](https://app.circleci.com/github/ttimt/GoogleHashCode/pipelines)
+[![Travis (.com)](https://img.shields.io/travis/com/ttimt/GoogleHashCode?style=for-the-badge&logo=travis)](https://travis-ci.com/ttimt/GoogleHashCode)
 ---
-![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/ttimt/GoogleHashCode?style=for-the-badge&logo=code-climate)
-![Code Climate issues](https://img.shields.io/codeclimate/issues/ttimt/GoogleHashCode?style=for-the-badge&logo=code-climate)
-![Code Climate technical debt](https://img.shields.io/codeclimate/tech-debt/ttimt/GoogleHashCode?style=for-the-badge&logo=code-climate)
+[![Code Climate maintainability](https://img.shields.io/codeclimate/maintainability/ttimt/GoogleHashCode?style=for-the-badge&logo=code-climate)](https://codeclimate.com/github/ttimt/GoogleHashCode)
+[![Code Climate issues](https://img.shields.io/codeclimate/issues/ttimt/GoogleHashCode?style=for-the-badge&logo=code-climate)](https://codeclimate.com/github/ttimt/GoogleHashCode/issues)
+[![Code Climate technical debt](https://img.shields.io/codeclimate/tech-debt/ttimt/GoogleHashCode?style=for-the-badge&logo=code-climate)](https://codeclimate.com/github/ttimt/GoogleHashCode)
 ---
-![Codecov](https://img.shields.io/codecov/c/github/ttimt/GoogleHashcode?logo=codecov&style=for-the-badge)
-![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/ttimt/GoogleHashCode?style=for-the-badge&logo=codefactor)
-![Codacy coverage](https://img.shields.io/codacy/grade/ea4f4daa8c1b4c1291bcbd5a7c1245ec?style=for-the-badge&logo=codacy)
-![Codacy coverage](https://img.shields.io/codacy/coverage/ea4f4daa8c1b4c1291bcbd5a7c1245ec?style=for-the-badge&logo=codacy)
+[![Codecov](https://img.shields.io/codecov/c/github/ttimt/GoogleHashcode?logo=codecov&style=for-the-badge)](https://codecov.io/gh/ttimt/GoogleHashCode)
+[![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/ttimt/GoogleHashCode?style=for-the-badge&logo=codefactor)](https://www.codefactor.io/repository/github/ttimt/googlehashcode)
+[![Codacy coverage](https://img.shields.io/codacy/grade/ea4f4daa8c1b4c1291bcbd5a7c1245ec?style=for-the-badge&logo=codacy)](https://www.codacy.com/manual/ttimt/GoogleHashCode)
+[![Codacy coverage](https://img.shields.io/codacy/coverage/ea4f4daa8c1b4c1291bcbd5a7c1245ec?style=for-the-badge&logo=codacy)](https://www.codacy.com/manual/ttimt/GoogleHashCode)
 ---
 ![GitHub top language](https://img.shields.io/github/languages/top/ttimt/GoogleHashCode?style=for-the-badge&logo=go)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -29,7 +29,7 @@
 [![Ask Me Anything !](https://img.shields.io/badge/Ask%20me-anything-1abc9c.svg)](https://linkedin.com/in/timothy0707/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ttimt/GoogleHashCode)](https://goreportcard.com/report/github.com/ttimt/GoogleHashCode)
 ![GitHub repo size](https://img.shields.io/github/repo-size/ttimt/GoogleHashCode)
-![GitHub issues](https://img.shields.io/github/issues/ttimt/GoogleHashCode)
+[![GitHub issues](https://img.shields.io/github/issues/ttimt/GoogleHashCode)](https://github.com/ttimt/GoogleHashCode/issues)
 ![GitHub contributors](https://img.shields.io/github/contributors/ttimt/GoogleHashCode)
 
 ![GitHub followers](https://img.shields.io/github/followers/ttimt?label=Follow&style=social)
