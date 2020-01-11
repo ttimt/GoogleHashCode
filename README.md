@@ -20,6 +20,7 @@
 ![Codecov](https://img.shields.io/codecov/c/github/ttimt/GoogleHashcode?logo=codecov&style=for-the-badge)
 ![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/ttimt/GoogleHashCode?style=for-the-badge&logo=codefactor)
 ![Codacy coverage](https://img.shields.io/codacy/grade/ea4f4daa8c1b4c1291bcbd5a7c1245ec?style=for-the-badge&logo=codacy)
+![Codacy coverage](https://img.shields.io/codacy/coverage/ea4f4daa8c1b4c1291bcbd5a7c1245ec?style=for-the-badge&logo=codacy)
 ---
 ![GitHub top language](https://img.shields.io/github/languages/top/ttimt/GoogleHashCode?style=for-the-badge&logo=go)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
