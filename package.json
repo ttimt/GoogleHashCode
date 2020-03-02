@@ -2,7 +2,7 @@
   "dependencies": {
     "chart.js": "^2.9.3",
     "diff": "^4.0.1",
-    "fomantic-ui": "^2.8.3",
+    "fomantic-ui": "^2.8.4",
     "g": "^2.0.1",
     "jquery": "^3.4.1"
   },

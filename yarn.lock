@@ -1334,10 +1334,10 @@ flush-write-stream@^1.0.2:
     inherits "^2.0.3"
     readable-stream "^2.3.6"
 
-fomantic-ui@^2.8.3:
-  version "2.8.3"
-  resolved "https://registry.yarnpkg.com/fomantic-ui/-/fomantic-ui-2.8.3.tgz#ead838807b3d9ce62e7d7bd4add727102f302f10"
-  integrity sha512-ki4B/cGqvWqhjSZewDLcjVjLRv77UJi1Dcfw7ZK1d8c6+kHrr8YnqfzE1MCWQjHM0CsD0CjnA+/mg3kyLuCZkw==
+fomantic-ui@^2.8.4:
+  version "2.8.4"
+  resolved "https://registry.yarnpkg.com/fomantic-ui/-/fomantic-ui-2.8.4.tgz#4a910ff8cf877f356c1ea9cca95540ed4bb024f7"
+  integrity sha512-We34raC+xqoaIOFFamsN8cHc+tCNy+6JWjWmkWIEjeIxZRrbXsoqto8eLFjMIPEwL1C6H0FwONqt39AmL+8zeg==
   dependencies:
     "@octokit/rest" "^16.16.0"
     better-console "1.0.1"
